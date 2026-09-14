@@ -1,0 +1,27 @@
+name: AFAMAX contract drift
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm contract:check
+        env:
+          AFAMAX_OPENAPI_AUTHORIZATION: ${{ secrets.AFAMAX_OPENAPI_AUTHORIZATION }}
+          AFAMAX_OPENAPI_COOKIE: ${{ secrets.AFAMAX_OPENAPI_COOKIE }}
