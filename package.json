@@ -18,6 +18,9 @@
   "engines": {
     "node": ">=22.12.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": ["dist", "README.md", "LICENSE"],
   "bin": {
     "real-estate-appraisal-mcp": "dist/transports/stdio.js"
@@ -31,6 +34,7 @@
     "contract:check": "tsx scripts/check-afamax-contract.ts",
     "dev:http": "tsx watch src/transports/http.ts",
     "dev:stdio": "tsx src/transports/stdio.ts",
+    "prepublishOnly": "pnpm check",
     "start": "node dist/transports/http.js",
     "test": "vitest run",
     "test:watch": "vitest",
