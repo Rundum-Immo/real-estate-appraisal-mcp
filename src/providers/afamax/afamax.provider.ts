@@ -1,6 +1,12 @@
-import type { PropertyDepreciationInput, PropertyDepreciationOutput } from '../../contracts/property-depreciation.js';
-import type { AppraisalProvider, AppraisalRequestContext } from '../appraisal-provider.js';
-import { AfamaxClient } from './afamax.client.js';
+import type {
+  PropertyDepreciationInput,
+  PropertyDepreciationOutput,
+} from "../../contracts/property-depreciation.js";
+import type {
+  AppraisalProvider,
+  AppraisalRequestContext,
+} from "../appraisal-provider.js";
+import { AfamaxClient } from "./afamax.client.js";
 
 export class AfamaxAppraisalProvider implements AppraisalProvider {
   constructor(private readonly client: AfamaxClient) {}

@@ -1,9 +1,16 @@
-import type { PropertyDepreciationOutput } from '../../contracts/property-depreciation.js';
+import type { PropertyDepreciationOutput } from "../../contracts/property-depreciation.js";
 
-const eur = new Intl.NumberFormat('en', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+const eur = new Intl.NumberFormat("en", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 0,
+});
 
-export function formatPropertyDepreciationResult(result: PropertyDepreciationOutput): string {
-  const valueSource = result.results.buildingValueSource === 'actual' ? 'provided' : 'assumed';
+export function formatPropertyDepreciationResult(
+  result: PropertyDepreciationOutput,
+): string {
+  const valueSource =
+    result.results.buildingValueSource === "actual" ? "provided" : "assumed";
   const lines = [
     `AfaMax estimates annual depreciation of ${eur.format(result.results.annualAfaAmount)} ` +
       `(${(result.results.afaRatePerYear * 100).toFixed(2)}% per year) and annual tax savings of ` +
@@ -14,19 +21,25 @@ export function formatPropertyDepreciationResult(result: PropertyDepreciationOut
   if (!result.results.appraisalWorthwhile) {
     lines.push(
       `The estimated remaining-useful-life rate (${(result.results.afaRatePerYear * 100).toFixed(2)}%) ` +
-      `does not exceed the statutory default rate (${(result.results.defaultAfaRatePerYear * 100).toFixed(2)}%); ` +
-      'recommend the statutory default AfA instead.',
+        `does not exceed the statutory default rate (${(result.results.defaultAfaRatePerYear * 100).toFixed(2)}%); ` +
+        "recommend the statutory default AfA instead.",
     );
   }
   if (result.assumptions.modernizationAssumedNone) {
-    lines.push('Modernization was assumed to be absent, so this is an upper-bound estimate; provide all eight component states for a better result.');
+    lines.push(
+      "Modernization was assumed to be absent, so this is an upper-bound estimate; provide all eight component states for a better result.",
+    );
   }
   if (result.assumptions.buildingValueAssumed) {
-    lines.push('The building value was assumed because the purchase and land-value inputs were incomplete.');
+    lines.push(
+      "The building value was assumed because the purchase and land-value inputs were incomplete.",
+    );
   }
   if (result.assumptions.taxRateAssumed) {
-    lines.push('The tax rate was assumed.');
+    lines.push("The tax rate was assumed.");
   }
-  lines.push(`${result.disclaimer} ${result.attribution.label}: ${result.attribution.url}`);
-  return lines.join('\n');
+  lines.push(
+    `${result.disclaimer} ${result.attribution.label}: ${result.attribution.url}`,
+  );
+  return lines.join("\n");
 }

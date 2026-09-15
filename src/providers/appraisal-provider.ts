@@ -1,4 +1,7 @@
-import type { PropertyDepreciationInput, PropertyDepreciationOutput } from '../contracts/property-depreciation.js';
+import type {
+  PropertyDepreciationInput,
+  PropertyDepreciationOutput,
+} from "../contracts/property-depreciation.js";
 
 export interface AppraisalRequestContext {
   clientIp?: string;
@@ -12,14 +15,14 @@ export interface AppraisalProvider {
 }
 
 export type ProviderErrorCode =
-  | 'configuration'
-  | 'invalid_response'
-  | 'network'
-  | 'rate_limited'
-  | 'service_disabled'
-  | 'timeout'
-  | 'upstream_error'
-  | 'upstream_validation';
+  | "configuration"
+  | "invalid_response"
+  | "network"
+  | "rate_limited"
+  | "service_disabled"
+  | "timeout"
+  | "upstream_error"
+  | "upstream_validation";
 
 export class AppraisalProviderError extends Error {
   constructor(
@@ -29,6 +32,6 @@ export class AppraisalProviderError extends Error {
     options?: ErrorOptions,
   ) {
     super(message, options);
-    this.name = 'AppraisalProviderError';
+    this.name = "AppraisalProviderError";
   }
 }
