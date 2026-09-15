@@ -1,7 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { AfamaxClient } from "../src/providers/afamax/afamax.client.js";
 import { AppraisalProviderError } from "../src/providers/appraisal-provider.js";
-import { validInput, validOutput } from "./fixtures.js";
+import {
+  validInput,
+  validOutput,
+  validPurchasePriceAllocationInput,
+  validPurchasePriceAllocationOutput,
+} from "./fixtures.js";
+
+const afaUrl = new URL("https://afamax.de/api/v1/afa-calculation");
+const kpaUrl = new URL("https://afamax.de/api/v1/purchase-price-allocation");
 
 describe("AfamaxClient", () => {
   it("forwards the service identity and validated client address", async () => {
@@ -14,7 +22,8 @@ describe("AfamaxClient", () => {
       },
     );
     const client = new AfamaxClient({
-      apiUrl: new URL("https://afamax.de/api/v1/afa-calculation"),
+      apiUrl: afaUrl,
+      purchasePriceAllocationApiUrl: kpaUrl,
       timeoutMs: 1000,
       serviceToken: "x".repeat(32),
       fetch: fetchMock,
@@ -35,7 +44,8 @@ describe("AfamaxClient", () => {
       },
     );
     const client = new AfamaxClient({
-      apiUrl: new URL("https://afamax.de/api/v1/afa-calculation"),
+      apiUrl: afaUrl,
+      purchasePriceAllocationApiUrl: kpaUrl,
       timeoutMs: 1000,
       fetch: fetchMock,
     });
@@ -45,7 +55,8 @@ describe("AfamaxClient", () => {
 
   it("maps rate limits without leaking an upstream body", async () => {
     const client = new AfamaxClient({
-      apiUrl: new URL("https://afamax.de/api/v1/afa-calculation"),
+      apiUrl: afaUrl,
+      purchasePriceAllocationApiUrl: kpaUrl,
       timeoutMs: 1000,
       fetch: async () =>
         Response.json(
@@ -69,7 +80,8 @@ describe("AfamaxClient", () => {
 
   it("rejects an invalid upstream success response", async () => {
     const client = new AfamaxClient({
-      apiUrl: new URL("https://afamax.de/api/v1/afa-calculation"),
+      apiUrl: afaUrl,
+      purchasePriceAllocationApiUrl: kpaUrl,
       timeoutMs: 1000,
       fetch: async () => Response.json({ calculationId: "incomplete" }),
     });
@@ -77,5 +89,49 @@ describe("AfamaxClient", () => {
     await expect(client.calculate(validInput)).rejects.toMatchObject({
       code: "invalid_response",
     });
+  });
+
+  it("routes purchase price allocation to its endpoint and validates the response", async () => {
+    const fetchMock = vi.fn(
+      async (url: string | URL | Request, init?: RequestInit) => {
+        expect(String(url)).toBe(String(kpaUrl));
+        const headers = new Headers(init?.headers);
+        expect(headers.get("x-afamax-service-token")).toBe("x".repeat(32));
+        expect(headers.get("x-afamax-client-ip")).toBe("2001:db8::10");
+        expect(JSON.parse(String(init?.body))).toEqual(
+          validPurchasePriceAllocationInput,
+        );
+        return Response.json(validPurchasePriceAllocationOutput);
+      },
+    );
+    const client = new AfamaxClient({
+      apiUrl: afaUrl,
+      purchasePriceAllocationApiUrl: kpaUrl,
+      timeoutMs: 1_000,
+      serviceToken: "x".repeat(32),
+      fetch: fetchMock,
+    });
+
+    await expect(
+      client.calculatePurchasePriceAllocation(
+        validPurchasePriceAllocationInput,
+        { clientIp: "2001:db8::10" },
+      ),
+    ).resolves.toEqual(validPurchasePriceAllocationOutput);
+  });
+
+  it("rejects an invalid purchase price allocation success response", async () => {
+    const client = new AfamaxClient({
+      apiUrl: afaUrl,
+      purchasePriceAllocationApiUrl: kpaUrl,
+      timeoutMs: 1_000,
+      fetch: async () => Response.json({ calculationId: "incomplete" }),
+    });
+
+    await expect(
+      client.calculatePurchasePriceAllocation(
+        validPurchasePriceAllocationInput,
+      ),
+    ).rejects.toMatchObject({ code: "invalid_response" });
   });
 });

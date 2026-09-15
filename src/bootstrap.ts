@@ -7,6 +7,7 @@ export function createDependencies(config: AppConfig) {
   const logger = createLogger(config.logLevel);
   const clientOptions = {
     apiUrl: config.afamaxApiUrl,
+    purchasePriceAllocationApiUrl: config.afamaxKpaApiUrl,
     timeoutMs: config.afamaxTimeoutMs,
     ...(config.afamaxServiceToken
       ? { serviceToken: config.afamaxServiceToken }

@@ -1,9 +1,12 @@
 import { z } from "zod";
 
 const defaultApiUrl = "https://afamax.de/api/v1/afa-calculation";
+const defaultPurchasePriceAllocationApiUrl =
+  "https://afamax.de/api/v1/purchase-price-allocation";
 
 const commonEnvironmentSchema = z.object({
   AFAMAX_API_URL: z.url().default(defaultApiUrl),
+  AFAMAX_KPA_API_URL: z.url().default(defaultPurchasePriceAllocationApiUrl),
   AFAMAX_SERVICE_TOKEN: z.string().min(32).optional(),
   AFAMAX_TIMEOUT_MS: z.coerce
     .number()
@@ -19,6 +22,7 @@ const commonEnvironmentSchema = z.object({
 
 export interface AppConfig {
   afamaxApiUrl: URL;
+  afamaxKpaApiUrl: URL;
   afamaxServiceToken?: string;
   afamaxTimeoutMs: number;
   host: string;
@@ -31,7 +35,11 @@ export function loadConfig(
   transport: "http" | "stdio",
   environment: NodeJS.ProcessEnv = process.env,
 ): AppConfig {
-  const parsed = commonEnvironmentSchema.parse(environment);
+  const parsed = commonEnvironmentSchema.parse(
+    transport === "stdio"
+      ? { ...environment, AFAMAX_SERVICE_TOKEN: undefined }
+      : environment,
+  );
 
   if (transport === "http" && !parsed.AFAMAX_SERVICE_TOKEN) {
     throw new Error(
@@ -48,7 +56,8 @@ export function loadConfig(
 
   return {
     afamaxApiUrl: new URL(parsed.AFAMAX_API_URL),
-    ...(parsed.AFAMAX_SERVICE_TOKEN
+    afamaxKpaApiUrl: new URL(parsed.AFAMAX_KPA_API_URL),
+    ...(transport === "http" && parsed.AFAMAX_SERVICE_TOKEN
       ? { afamaxServiceToken: parsed.AFAMAX_SERVICE_TOKEN }
       : {}),
     afamaxTimeoutMs: parsed.AFAMAX_TIMEOUT_MS,

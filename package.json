@@ -1,7 +1,7 @@
 {
   "name": "@rundum-immo/real-estate-appraisal-mcp",
   "version": "0.1.0",
-  "description": "MCP server for German real-estate depreciation estimates powered by AfaMax",
+  "description": "MCP server for German real-estate depreciation and purchase-price allocation powered by AfaMax",
   "type": "module",
   "license": "MIT",
   "author": "Rundum Immo",
@@ -13,7 +13,7 @@
   "bugs": {
     "url": "https://github.com/Rundum-Immo/real-estate-appraisal-mcp/issues"
   },
-  "keywords": ["mcp", "real-estate", "depreciation", "afa", "germany"],
+  "keywords": ["mcp", "real-estate", "depreciation", "afa", "kaufpreisaufteilung", "germany"],
   "mcpName": "immo.rundum/real-estate-appraisal",
   "engines": {
     "node": ">=22.12.0"
@@ -31,7 +31,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "pnpm typecheck && pnpm test && pnpm build",
-    "contract:check": "tsx scripts/check-afamax-contract.ts",
+    "contract:check": "tsx --env-file-if-exists=.env scripts/check-afamax-contract.ts",
     "dev:http": "tsx watch --env-file-if-exists=.env src/transports/http.ts",
     "dev:stdio": "tsx --env-file-if-exists=.env src/transports/stdio.ts",
     "prepublishOnly": "pnpm check",

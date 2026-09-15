@@ -5,6 +5,7 @@ import type {
 } from "./providers/appraisal-provider.js";
 import type { Logger } from "./observability/logger.js";
 import { registerPropertyDepreciationTool } from "./tools/property-depreciation/register.js";
+import { registerPurchasePriceAllocationTool } from "./tools/purchase-price-allocation/register.js";
 
 export const serverInfo = {
   name: "immo.rundum/real-estate-appraisal",
@@ -20,6 +21,12 @@ export interface CreateServerOptions {
 export function createServer(options: CreateServerOptions): McpServer {
   const server = new McpServer(serverInfo);
   registerPropertyDepreciationTool(
+    server,
+    options.provider,
+    options.requestContext ?? {},
+    options.logger,
+  );
+  registerPurchasePriceAllocationTool(
     server,
     options.provider,
     options.requestContext ?? {},

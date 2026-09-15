@@ -4,12 +4,18 @@ import {
   type PropertyDepreciationOutput,
 } from "../../contracts/property-depreciation.js";
 import {
+  purchasePriceAllocationOutputSchema,
+  type PurchasePriceAllocationInput,
+  type PurchasePriceAllocationOutput,
+} from "../../contracts/purchase-price-allocation.js";
+import {
   AppraisalProviderError,
   type AppraisalRequestContext,
 } from "../appraisal-provider.js";
 
 export interface AfamaxClientOptions {
   apiUrl: URL;
+  purchasePriceAllocationApiUrl: URL;
   timeoutMs: number;
   serviceToken?: string;
   fetch?: typeof globalThis.fetch;
@@ -24,12 +30,14 @@ const maxResponseBytes = 256 * 1024;
 
 export class AfamaxClient {
   readonly #apiUrl: URL;
+  readonly #purchasePriceAllocationApiUrl: URL;
   readonly #timeoutMs: number;
   readonly #serviceToken: string | undefined;
   readonly #fetch: typeof globalThis.fetch;
 
   constructor(options: AfamaxClientOptions) {
     this.#apiUrl = options.apiUrl;
+    this.#purchasePriceAllocationApiUrl = options.purchasePriceAllocationApiUrl;
     this.#timeoutMs = options.timeoutMs;
     this.#serviceToken = options.serviceToken;
     this.#fetch = options.fetch ?? globalThis.fetch;
@@ -39,6 +47,41 @@ export class AfamaxClient {
     input: PropertyDepreciationInput,
     context: AppraisalRequestContext = {},
   ): Promise<PropertyDepreciationOutput> {
+    const body = await this.#request(this.#apiUrl, input, context);
+    const result = propertyDepreciationOutputSchema.safeParse(body);
+    if (!result.success) {
+      throw new AppraisalProviderError(
+        "invalid_response",
+        "AfaMax returned a response that does not match the public API contract.",
+      );
+    }
+    return result.data;
+  }
+
+  async calculatePurchasePriceAllocation(
+    input: PurchasePriceAllocationInput,
+    context: AppraisalRequestContext = {},
+  ): Promise<PurchasePriceAllocationOutput> {
+    const body = await this.#request(
+      this.#purchasePriceAllocationApiUrl,
+      input,
+      context,
+    );
+    const result = purchasePriceAllocationOutputSchema.safeParse(body);
+    if (!result.success) {
+      throw new AppraisalProviderError(
+        "invalid_response",
+        "AfaMax returned a response that does not match the public API contract.",
+      );
+    }
+    return result.data;
+  }
+
+  async #request(
+    apiUrl: URL,
+    input: unknown,
+    context: AppraisalRequestContext,
+  ): Promise<unknown> {
     if (this.#serviceToken && !context.clientIp) {
       throw new AppraisalProviderError(
         "configuration",
@@ -58,7 +101,7 @@ export class AfamaxClient {
 
     let response: Response;
     try {
-      response = await this.#fetch(this.#apiUrl, {
+      response = await this.#fetch(apiUrl, {
         method: "POST",
         headers,
         body: JSON.stringify(input),
@@ -108,14 +151,7 @@ export class AfamaxClient {
       throw this.#mapError(response, body);
     }
 
-    const result = propertyDepreciationOutputSchema.safeParse(body);
-    if (!result.success) {
-      throw new AppraisalProviderError(
-        "invalid_response",
-        "AfaMax returned a response that does not match the public API contract.",
-      );
-    }
-    return result.data;
+    return body;
   }
 
   #mapError(response: Response, body: unknown): AppraisalProviderError {

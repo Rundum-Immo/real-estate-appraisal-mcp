@@ -2,6 +2,10 @@ import type {
   PropertyDepreciationInput,
   PropertyDepreciationOutput,
 } from "../contracts/property-depreciation.js";
+import type {
+  PurchasePriceAllocationInput,
+  PurchasePriceAllocationOutput,
+} from "../contracts/purchase-price-allocation.js";
 
 export interface AppraisalRequestContext {
   clientIp?: string;
@@ -12,6 +16,10 @@ export interface AppraisalProvider {
     input: PropertyDepreciationInput,
     context?: AppraisalRequestContext,
   ): Promise<PropertyDepreciationOutput>;
+  calculatePurchasePriceAllocation(
+    input: PurchasePriceAllocationInput,
+    context?: AppraisalRequestContext,
+  ): Promise<PurchasePriceAllocationOutput>;
 }
 
 export type ProviderErrorCode =

@@ -50,6 +50,47 @@ const expectedPropertyTypes = [
   "APARTMENT_BUILDING",
   "RESIDENTIAL_COMMERCIAL_BUILDING",
 ];
+const expectedKpaRequestProperties = [
+  "propertyType",
+  "totalPurchasePrice",
+  "purchaseRelatedCosts",
+  "includedInventory",
+  "purchaseDate",
+  "constructionYear",
+  "floorArea",
+  "landArea",
+  "standardLandValue",
+  "commercialShare",
+  "coOwnershipNumerator",
+  "coOwnershipDenominator",
+  "garages",
+  "undergroundParkingSpaces",
+  "monthlyNetColdRent",
+  "locale",
+];
+const expectedKpaResponseProperties = [
+  "calculationId",
+  "input",
+  "applied",
+  "methods",
+  "skipped",
+  "degenerate",
+  "assetMethodDefaults",
+  "attribution",
+  "disclaimer",
+  "meta",
+];
+const expectedKpaMethodProperties = [
+  "method",
+  "landValue",
+  "buildingValue",
+  "totalValue",
+  "buildingShare",
+  "totalAcquisitionCost",
+  "depreciationBase",
+  "landAllocation",
+  "currency",
+];
 
 type JsonObject = Record<string, unknown>;
 
@@ -92,6 +133,10 @@ if (!response.ok)
   throw new Error(`Could not load ${openApiUrl}: HTTP ${response.status}`);
 
 const document = asObject(await response.json(), "OpenAPI document");
+const paths = asObject(document.paths, "paths");
+for (const path of ["/v1/afa-calculation", "/v1/purchase-price-allocation"]) {
+  if (!(path in paths)) throw new Error(`OpenAPI path is missing: ${path}`);
+}
 const components = asObject(document.components, "components");
 const schemas = asObject(components.schemas, "components.schemas");
 const requestSchema = asObject(
@@ -101,6 +146,14 @@ const requestSchema = asObject(
 const responseSchema = asObject(
   schemas.PublicAfaCalculationResponse,
   "PublicAfaCalculationResponse",
+);
+const kpaRequestSchema = asObject(
+  schemas.PublicPurchasePriceAllocationRequest,
+  "PublicPurchasePriceAllocationRequest",
+);
+const kpaResponseSchema = asObject(
+  schemas.PublicPurchasePriceAllocationResponse,
+  "PublicPurchasePriceAllocationResponse",
 );
 const requestProperties = properties(
   requestSchema,
@@ -135,6 +188,70 @@ assertSameMembers(
   Object.keys(properties(responseProperties.results, "results")),
   expectedResultProperties,
   "result properties",
+);
+
+const kpaRequestProperties = properties(
+  kpaRequestSchema,
+  "PublicPurchasePriceAllocationRequest",
+);
+const kpaResponseProperties = properties(
+  kpaResponseSchema,
+  "PublicPurchasePriceAllocationResponse",
+);
+assertSameMembers(
+  Object.keys(kpaRequestProperties),
+  expectedKpaRequestProperties,
+  "KPA request properties",
+);
+assertSameMembers(
+  kpaRequestSchema.required as string[],
+  [
+    "propertyType",
+    "totalPurchasePrice",
+    "purchaseDate",
+    "constructionYear",
+    "floorArea",
+    "landArea",
+    "standardLandValue",
+  ],
+  "KPA request required fields",
+);
+assertSameMembers(
+  asObject(kpaRequestProperties.propertyType, "KPA propertyType")
+    .enum as string[],
+  expectedPropertyTypes,
+  "KPA propertyType enum",
+);
+assertSameMembers(
+  Object.keys(kpaResponseProperties),
+  expectedKpaResponseProperties,
+  "KPA response properties",
+);
+assertSameMembers(
+  kpaResponseSchema.required as string[],
+  expectedKpaResponseProperties,
+  "KPA response required fields",
+);
+assertSameMembers(
+  Object.keys(properties(kpaResponseProperties.applied, "KPA applied")),
+  expectedKpaMethodProperties,
+  "KPA applied method properties",
+);
+const kpaMethodItems = asObject(
+  asObject(kpaResponseProperties.methods, "KPA methods").items,
+  "KPA methods.items",
+);
+if (kpaMethodItems.$ref !== "#/properties/applied") {
+  throw new Error(
+    `KPA methods items drifted. Expected reference to applied; received ${String(kpaMethodItems.$ref)}`,
+  );
+}
+assertSameMembers(
+  Object.keys(
+    properties(kpaResponseProperties.assetMethodDefaults, "KPA asset defaults"),
+  ),
+  ["standardLevel", "regionalFactor", "marketAdjustmentFactor"],
+  "KPA asset default properties",
 );
 
 process.stdout.write(

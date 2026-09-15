@@ -1,4 +1,5 @@
 import type { PropertyDepreciationOutput } from "../src/contracts/property-depreciation.js";
+import type { PurchasePriceAllocationOutput } from "../src/contracts/purchase-price-allocation.js";
 
 export const validInput = {
   propertyType: "CONDOMINIUM" as const,
@@ -67,3 +68,97 @@ export const validOutput: PropertyDepreciationOutput = {
     calculatedAt: "2026-09-14T10:00:00.000Z",
   },
 };
+
+export const validPurchasePriceAllocationInput = {
+  propertyType: "CONDOMINIUM" as const,
+  totalPurchasePrice: 500_000,
+  purchaseRelatedCosts: 40_000,
+  purchaseDate: "2024-06-15",
+  constructionYear: 1975,
+  floorArea: 75,
+  landArea: 1_200,
+  standardLandValue: 2_500,
+  coOwnershipNumerator: 75,
+  coOwnershipDenominator: 1_000,
+  undergroundParkingSpaces: 1,
+  monthlyNetColdRent: 1_400,
+  locale: "en" as const,
+};
+
+export const validPurchasePriceAllocationOutput: PurchasePriceAllocationOutput =
+  {
+    calculationId: "kpa_pub_test",
+    input: {
+      propertyType: "CONDOMINIUM",
+      totalPurchasePrice: 500_000,
+      purchasePrice: 500_000,
+      purchaseRelatedCosts: 40_000,
+      includedInventory: 0,
+      purchaseDate: "2024-06-15",
+      constructionYear: 1975,
+      floorArea: 75,
+      landArea: 1_200,
+      standardLandValue: 2_500,
+      commercialShare: null,
+      coOwnershipNumerator: 75,
+      coOwnershipDenominator: 1_000,
+      garages: 0,
+      undergroundParkingSpaces: 1,
+      monthlyNetColdRent: 1_400,
+      locale: "en",
+    },
+    applied: {
+      method: "income",
+      landValue: 225_000,
+      buildingValue: 130_854,
+      totalValue: 355_854,
+      buildingShare: 0.3678,
+      totalAcquisitionCost: 540_000,
+      depreciationBase: 198_612,
+      landAllocation: 341_388,
+      currency: "EUR",
+    },
+    methods: [
+      {
+        method: "income",
+        landValue: 225_000,
+        buildingValue: 130_854,
+        totalValue: 355_854,
+        buildingShare: 0.3678,
+        totalAcquisitionCost: 540_000,
+        depreciationBase: 198_612,
+        landAllocation: 341_388,
+        currency: "EUR",
+      },
+      {
+        method: "asset",
+        landValue: 225_000,
+        buildingValue: 84_486,
+        totalValue: 309_486,
+        buildingShare: 0.273,
+        totalAcquisitionCost: 540_000,
+        depreciationBase: 147_420,
+        landAllocation: 392_580,
+        currency: "EUR",
+      },
+    ],
+    skipped: [{ method: "comparative", missing: ["comparativeFactorPerSqm"] }],
+    degenerate: [],
+    assetMethodDefaults: {
+      standardLevel: 2,
+      regionalFactor: 1,
+      marketAdjustmentFactor: 1,
+    },
+    attribution: {
+      provider: "AfaMax",
+      url: "https://afamax.de/en/purchase-price-allocation",
+      label: "AfaMax purchase price allocation calculator",
+    },
+    disclaimer:
+      "This purchase price allocation is a non-binding estimate based on the BMF method and does not constitute tax advice.",
+    meta: {
+      apiVersion: "v1",
+      calculationMethod: "bmf-kaufpreisaufteilung-2026",
+      calculatedAt: "2026-09-15T10:00:00.000Z",
+    },
+  };

@@ -1,6 +1,6 @@
 # Rundum Immo Real Estate Appraisal MCP
 
-An open-source Model Context Protocol server for indicative German real-estate depreciation estimates. It exposes one tool, `calculate_property_depreciation`, and delegates calculations to the public [AfaMax](https://afamax.de) API. Proprietary appraisal formulas remain in AFAMAX.
+An open-source Model Context Protocol server for indicative German real-estate depreciation and purchase-price allocation. It exposes `calculate_property_depreciation` and `calculate_purchase_price_allocation`, delegating both calculations to the public [AfaMax](https://afamax.de) APIs. Proprietary appraisal formulas remain in AFAMAX.
 
 <!-- mcp-name: immo.rundum/real-estate-appraisal -->
 
@@ -14,7 +14,7 @@ The planned Streamable HTTP endpoint is:
 https://mcp.rundum.immo/mcp
 ```
 
-It is not production-ready yet. Once launched, no end-user API key will be required. The legacy `https://afamax.de/api/mcp` endpoint remains available during migration.
+It is not production-ready yet. Once launched, no end-user API key will be required. The separate `https://afamax.de/api/mcp` endpoint remains available and may expose additional AfaMax-specific appraisal workflows.
 
 ## Run from source over stdio
 
@@ -57,7 +57,9 @@ Once `v0.1.0` is published, the source path can be replaced with:
 }
 ```
 
-## Tool
+## Tools
+
+### Property depreciation
 
 `calculate_property_depreciation` accepts the complete public AFAMAX request contract:
 
@@ -76,6 +78,38 @@ Example input:
   "floorArea": 85,
   "purchasePrice": 350000,
   "taxRate": 0.42,
+  "locale": "en"
+}
+```
+
+### Purchase-price allocation
+
+`calculate_purchase_price_allocation` divides acquisition costs between non-depreciable land and the depreciable building using the German Federal Ministry of Finance (BMF) method.
+
+- Required: property type, total purchase price, purchase date, construction year, floor area, land area, and standard land value.
+- Condominiums also require the numerator and denominator of the co-ownership share.
+- Mixed-use residential/commercial buildings also require whether the commercial share is under or over 50%.
+- Optional: purchase costs, included inventory, garage and underground-parking counts, monthly net cold rent, and locale.
+- Results: the applied method, meaningful alternatives, land/building shares and values, depreciation base, unavailable or unusable method reasons, and disclosed asset-method defaults.
+
+Providing monthly net cold rent enables the income method; otherwise the calculation falls back to the asset method. Comparative valuation is unavailable because the public contract excludes surveyor-only factors. Results are indicative and do not replace tax or legal advice.
+
+Example input:
+
+```json
+{
+  "propertyType": "CONDOMINIUM",
+  "totalPurchasePrice": 500000,
+  "purchaseRelatedCosts": 40000,
+  "purchaseDate": "2024-06-15",
+  "constructionYear": 1975,
+  "floorArea": 75,
+  "landArea": 1200,
+  "standardLandValue": 2500,
+  "coOwnershipNumerator": 75,
+  "coOwnershipDenominator": 1000,
+  "undergroundParkingSpaces": 1,
+  "monthlyNetColdRent": 1400,
   "locale": "en"
 }
 ```
@@ -102,17 +136,18 @@ Build and launch the local stdio server through [MCP Inspector](https://github.c
 
 ```bash
 pnpm build
-npx -y @modelcontextprotocol/inspector node dist/transports/stdio.js
+npx -y @modelcontextprotocol/inspector \
+  node --env-file-if-exists=.env dist/transports/stdio.js
 ```
 
-Connect in the browser, open **Tools**, and call `calculate_property_depreciation` with the example input above. A successful response contains a readable summary and structured output with remaining useful life, annual and monthly AfA, statutory comparison, assumptions, and AfaMax attribution.
+Connect in the browser, open **Tools**, and call either tool with its example input above. Successful responses contain a readable summary, structured output, disclosed assumptions/defaults, and AfaMax attribution.
 
 To inspect the registered tools from the command line:
 
 ```bash
 npx -y @modelcontextprotocol/inspector \
   --cli \
-  node dist/transports/stdio.js \
+  node --env-file-if-exists=.env dist/transports/stdio.js \
   --method tools/list
 ```
 
@@ -130,6 +165,7 @@ Configuration:
 | Variable | Default | Purpose |
 |---|---|---|
 | `AFAMAX_API_URL` | `https://afamax.de/api/v1/afa-calculation` | Public calculation endpoint |
+| `AFAMAX_KPA_API_URL` | `https://afamax.de/api/v1/purchase-price-allocation` | Public purchase-price allocation endpoint |
 | `AFAMAX_SERVICE_TOKEN` | — | Required trusted-service credential in HTTP mode |
 | `AFAMAX_TIMEOUT_MS` | `10000` | Upstream timeout |
 | `HOST` | `0.0.0.0` | Listen address |
@@ -159,11 +195,10 @@ The adapter is stateless and does not persist tool inputs or raw client IP addre
 
 ## Roadmap
 
-The repository is intentionally broader than its first depreciation tool. Potential future capabilities include:
+The repository can grow beyond its initial calculation tools. Potential future capabilities include:
 
 - Property and market-value estimation
 - Appraisal and valuation-report workflows
-- Purchase-price allocation
 - Additional German real-estate tax and appraisal tools
 
 Future tools will follow the same boundary: this repository contains the public MCP integration, while proprietary appraisal logic remains in AFAMAX.
