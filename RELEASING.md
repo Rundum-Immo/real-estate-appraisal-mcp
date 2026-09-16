@@ -6,8 +6,9 @@ This runbook covers releases of both supported transports:
 - the stdio package `@rundum-immo/real-estate-appraisal-mcp`
 
 The release order is intentional: prepare and verify one commit, deploy that
-commit to Coolify, publish it to npm, tag it, create the GitHub Release, and
-finally publish its metadata to the MCP Registry.
+commit to Coolify, publish it to npm, and tag it. The tag publishes its
+metadata to the MCP Registry through a protected GitHub Actions environment;
+the GitHub Release is then created from the same tag.
 
 ## Required access
 
@@ -17,11 +18,12 @@ The release maintainer needs:
 - access to the Rundum Immo Coolify application
 - membership in the npm `rundum-immo` organization with 2FA enabled
 - access to the AFAMAX service credential used by the hosted server
-- access to the `rundum.immo` MCP Registry signing key in the company secret
-  manager
+- access to the protected `mcp-registry-publish` GitHub environment
 
 Never commit or paste the AFAMAX service token or MCP Registry private key into
-issues, release notes, build logs, or shell scripts.
+issues, release notes, build logs, or shell scripts. The MCP Registry private
+seed is stored only as the `MCP_PRIVATE_KEY` secret in the protected GitHub
+environment.
 
 ## 1. Choose and synchronize the version
 
@@ -143,6 +145,9 @@ git show --no-patch --decorate v<version>
 git push origin v<version>
 ```
 
+Pushing the tag starts the `Publish to MCP Registry` workflow. Its protected
+environment may require an authorized maintainer to approve the job.
+
 On GitHub, create a release from the existing tag:
 
 - title: `v<version> - <short release name>`
@@ -158,7 +163,54 @@ patch release.
 ## 6. Publish to the MCP Registry
 
 The npm package and hosted endpoint must be live before publishing
-`server.json`:
+`server.json`. Publication is handled by
+`.github/workflows/publish-mcp-registry.yml`. The workflow:
+
+- runs for version tags and can also be started manually
+- checks that `package.json`, `server.json`, and a triggering version tag agree
+- downloads the pinned MCP publisher and verifies its SHA-256 checksum
+- validates `server.json`
+- authenticates with the protected `MCP_PRIVATE_KEY` environment secret
+- publishes `immo.rundum/real-estate-appraisal`
+- waits for the exact name and version to become visible in the public registry
+
+### One-time DNS and GitHub setup
+
+Generate an Ed25519 key pair outside the repository. Publish the raw public key
+as a TXT record on the `rundum.immo` apex:
+
+```text
+v=MCPv1; k=ed25519; p=<base64-encoded-raw-public-key>
+```
+
+Create a GitHub environment named `mcp-registry-publish`, add any desired
+reviewer and deployment-branch protections, and save the 64-character
+hexadecimal private seed as its `MCP_PRIVATE_KEY` environment secret. The
+private seed is not the PEM file and is not Base64 encoded.
+
+Confirm the DNS record is public before the first publication:
+
+```bash
+dig TXT rundum.immo +short
+```
+
+Do not remove unrelated TXT records. When rotating the signing key, replace
+the old MCP TXT value instead of leaving both MCP keys published, then update
+the GitHub environment secret.
+
+### Initial publication
+
+Adding a workflow after a tag was pushed does not run it retroactively. For
+the initial `v0.1.0` publication, open **Actions → Publish to MCP Registry →
+Run workflow**, select `main`, and approve the protected environment if GitHub
+requests it.
+
+For later releases, pushing `v<version>` starts the workflow automatically.
+Do not manually run it as well. Open the workflow run and confirm all steps
+completed before considering the registry publication successful.
+
+For emergency diagnosis only, a maintainer can perform the equivalent steps
+locally after installing the pinned publisher:
 
 ```bash
 mcp-publisher validate server.json
@@ -171,9 +223,9 @@ mcp-publisher publish server.json
 ```
 
 The DNS public-key proof remains on the `rundum.immo` apex. The private key
-must remain in the company secret manager. After publication, verify the
-registry entry `immo.rundum/real-estate-appraisal` exposes both the npm stdio
-package and `https://mcp.rundum.immo/mcp`.
+must remain in the protected GitHub environment. After publication, verify
+the registry entry `immo.rundum/real-estate-appraisal` exposes both the npm
+stdio package and `https://mcp.rundum.immo/mcp`.
 
 ## 7. Post-release checks
 

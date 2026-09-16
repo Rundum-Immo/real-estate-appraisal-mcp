@@ -4,3 +4,7 @@ coverage/
 .env
 .DS_Store
 *.log
+
+# Local MCP Registry signing keys
+private.pem
+public.pem
