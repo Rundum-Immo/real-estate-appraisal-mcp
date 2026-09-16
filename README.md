@@ -4,17 +4,15 @@ An open-source Model Context Protocol server for indicative German real-estate d
 
 <!-- mcp-name: immo.rundum/real-estate-appraisal -->
 
-> **Status: pre-release.** The source and local stdio transport are ready. The npm package and hosted MCP endpoint will become available with the first production release.
+## Hosted server
 
-## Planned hosted server
-
-The planned Streamable HTTP endpoint is:
+The public Streamable HTTP endpoint is:
 
 ```text
 https://mcp.rundum.immo/mcp
 ```
 
-It is not production-ready yet. Once launched, no end-user API key will be required. The separate `https://afamax.de/api/mcp` endpoint remains available and may expose additional AfaMax-specific appraisal workflows.
+No end-user API key is required. Calls are subject to AFAMAX per-client and service-wide rate limits and abuse protections.
 
 ## Run from source over stdio
 
@@ -42,9 +40,9 @@ Configure your MCP client to run the built server, replacing the path with the a
 
 The stdio server calls the anonymous AFAMAX API directly. Its public limits are 30 requests per minute and 500 requests per rolling day per IP; a tenant-wide ceiling may also apply. It writes protocol messages only to stdout and operational logs only to stderr.
 
-### Install from npm after the first release
+## Install from npm over stdio
 
-Once `v0.1.0` is published, the source path can be replaced with:
+Node.js 22.12 or newer is required. Configure your MCP client to launch the published package with `npx`:
 
 ```json
 {

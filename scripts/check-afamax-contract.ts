@@ -119,12 +119,6 @@ function assertSameMembers(
 }
 
 const headers = new Headers({ accept: "application/json" });
-if (process.env.AFAMAX_OPENAPI_AUTHORIZATION) {
-  headers.set("authorization", process.env.AFAMAX_OPENAPI_AUTHORIZATION);
-}
-if (process.env.AFAMAX_OPENAPI_COOKIE) {
-  headers.set("cookie", process.env.AFAMAX_OPENAPI_COOKIE);
-}
 const response = await fetch(openApiUrl, {
   headers,
   signal: AbortSignal.timeout(15_000),

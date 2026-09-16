@@ -24,5 +24,5 @@ COPY package.json LICENSE README.md ./
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/health',{headers:{host:(process.env.PUBLIC_HOSTS||'mcp.rundum.immo').split(',')[0]}}).then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+  CMD node -e "const host=(process.env.PUBLIC_HOSTS||'mcp.rundum.immo').split(',')[0];require('node:http').get({hostname:'127.0.0.1',port:process.env.PORT||3000,path:'/health',headers:{host}},r=>{r.resume();r.on('end',()=>process.exit(r.statusCode===200?0:1))}).on('error',()=>process.exit(1))"
 CMD ["node", "dist/transports/http.js"]

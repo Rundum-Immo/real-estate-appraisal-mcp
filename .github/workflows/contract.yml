@@ -22,6 +22,3 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm contract:check
-        env:
-          AFAMAX_OPENAPI_AUTHORIZATION: ${{ secrets.AFAMAX_OPENAPI_AUTHORIZATION }}
-          AFAMAX_OPENAPI_COOKIE: ${{ secrets.AFAMAX_OPENAPI_COOKIE }}

@@ -249,7 +249,6 @@ async function main(): Promise<void> {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   void main().catch((error) => {
-    console.log(error);
     process.stderr.write(
       `${JSON.stringify({ level: "error", event: "startup_failed", errorType: error instanceof Error ? error.name : "UnknownError" })}\n`,
     );
