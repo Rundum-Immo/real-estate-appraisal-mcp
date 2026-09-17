@@ -94,7 +94,7 @@ export const purchasePriceAllocationInputSchema = z
     locale: nullAsAbsent(
       z.enum(["de", "en"]).optional().default("de"),
     ).describe(
-      "Language for the disclaimer and AfaMax attribution link. Defaults to German.",
+      "Language for the disclaimer and AfAMax attribution link. Defaults to German.",
     ),
   })
   .strict()

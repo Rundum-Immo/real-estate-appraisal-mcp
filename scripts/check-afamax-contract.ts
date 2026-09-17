@@ -249,5 +249,5 @@ assertSameMembers(
 );
 
 process.stdout.write(
-  `AFAMAX OpenAPI contract matches the MCP mirror at ${openApiUrl}\n`,
+  `AfAMax OpenAPI contract matches the MCP mirror at ${openApiUrl}\n`,
 );

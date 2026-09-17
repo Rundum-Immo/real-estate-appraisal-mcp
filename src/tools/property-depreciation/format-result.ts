@@ -17,7 +17,7 @@ export function formatPropertyDepreciationResult(
     result.results.buildingValueSource === "actual" ? "provided" : "assumed";
   const lines = [
     formatSourceLine(result.attribution),
-    `AfaMax estimates annual depreciation of ${eur.format(result.results.annualAfaAmount)} ` +
+    `AfAMax estimates annual depreciation of ${eur.format(result.results.annualAfaAmount)} ` +
       `(${(result.results.afaRatePerYear * 100).toFixed(2)}% per year) and annual tax savings of ` +
       `${eur.format(result.results.annualTaxSavings)} using a ${valueSource} building value.`,
     `Estimated remaining useful life: ${result.results.remainingUsefulLifeYears} years.`,

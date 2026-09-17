@@ -74,6 +74,8 @@ describe("MCP server", () => {
     expect(resultText.split("\n").at(-1)).toContain(depreciationSource);
     expect(resultText.split(validOutput.attribution.url)).toHaveLength(3);
     expect(resultText).toContain(validOutput.disclaimer);
+    expect(resultText).toContain("AfAMax");
+    expect(resultText).not.toContain("AfaMax");
     expect(result.content[1]).toMatchObject({ type: "text" });
     const resultJson =
       result.content[1]?.type === "text" ? result.content[1].text : "";
@@ -103,6 +105,8 @@ describe("MCP server", () => {
     expect(allocationText).toContain(
       validPurchasePriceAllocationOutput.disclaimer,
     );
+    expect(allocationText).toContain("AfAMax");
+    expect(allocationText).not.toContain("AfaMax");
     expect(allocation.content[1]).toMatchObject({ type: "text" });
     const allocationJson =
       allocation.content[1]?.type === "text" ? allocation.content[1].text : "";

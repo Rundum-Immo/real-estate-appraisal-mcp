@@ -17,10 +17,10 @@ The release maintainer needs:
 - write access to this GitHub repository
 - access to the Rundum Immo Coolify application
 - membership in the npm `rundum-immo` organization with 2FA enabled
-- access to the AFAMAX service credential used by the hosted server
+- access to the AfAMax service credential used by the hosted server
 - access to the protected `mcp-registry-publish` GitHub environment
 
-Never commit or paste the AFAMAX service token or MCP Registry private key into
+Never commit or paste the AfAMax service token or MCP Registry private key into
 issues, release notes, build logs, or shell scripts. The MCP Registry private
 seed is stored only as the `MCP_PRIVATE_KEY` secret in the protected GitHub
 environment.
@@ -34,7 +34,7 @@ all of these locations:
 - the top-level version and npm package version in `server.json`
 - the MCP server implementation in `src/server.ts`
 - the `/health` response in `src/transports/http.ts`
-- the AFAMAX user agent in `src/providers/afamax/afamax.client.ts`
+- the AfAMax user agent in `src/providers/afamax/afamax.client.ts`
 
 Search the repository for the previous version and confirm no runtime version
 was missed:
@@ -233,7 +233,7 @@ stdio package and `https://mcp.rundum.immo/mcp`.
   same version.
 - Confirm the GitHub tag resolves to npm's `gitHead`.
 - Monitor Coolify health and application logs.
-- Monitor AFAMAX trusted-service errors and rate-limit behavior.
+- Monitor AfAMax trusted-service errors and rate-limit behavior.
 - Record any compatibility warnings for the next patch release.
 
 Documentation-only commits made after the tag do not require a Coolify

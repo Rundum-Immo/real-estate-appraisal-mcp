@@ -52,7 +52,7 @@ export class AfamaxClient {
     if (!result.success) {
       throw new AppraisalProviderError(
         "invalid_response",
-        "AfaMax returned a response that does not match the public API contract.",
+        "AfAMax returned a response that does not match the public API contract.",
       );
     }
     return result.data;
@@ -71,7 +71,7 @@ export class AfamaxClient {
     if (!result.success) {
       throw new AppraisalProviderError(
         "invalid_response",
-        "AfaMax returned a response that does not match the public API contract.",
+        "AfAMax returned a response that does not match the public API contract.",
       );
     }
     return result.data;
@@ -114,14 +114,14 @@ export class AfamaxClient {
       ) {
         throw new AppraisalProviderError(
           "timeout",
-          "AfaMax did not respond before the request timed out.",
+          "AfAMax did not respond before the request timed out.",
           undefined,
           { cause: error },
         );
       }
       throw new AppraisalProviderError(
         "network",
-        "AfaMax could not be reached.",
+        "AfAMax could not be reached.",
         undefined,
         { cause: error },
       );
@@ -131,7 +131,7 @@ export class AfamaxClient {
     if (Buffer.byteLength(text, "utf8") > maxResponseBytes) {
       throw new AppraisalProviderError(
         "invalid_response",
-        "AfaMax returned an unexpectedly large response.",
+        "AfAMax returned an unexpectedly large response.",
       );
     }
 
@@ -141,7 +141,7 @@ export class AfamaxClient {
     } catch (error) {
       throw new AppraisalProviderError(
         "invalid_response",
-        "AfaMax returned invalid JSON.",
+        "AfAMax returned invalid JSON.",
         undefined,
         { cause: error },
       );
@@ -168,25 +168,25 @@ export class AfamaxClient {
     if (response.status === 429 || upstream.errorCode === "RATE_LIMITED") {
       return new AppraisalProviderError(
         "rate_limited",
-        "AfaMax rate limit reached. Please try again later.",
+        "AfAMax rate limit reached. Please try again later.",
         retryAfterSeconds,
       );
     }
     if (response.status === 422 || upstream.errorCode === "VALIDATION_FAILED") {
       return new AppraisalProviderError(
         "upstream_validation",
-        "AfaMax rejected the calculation input.",
+        "AfAMax rejected the calculation input.",
       );
     }
     if (response.status === 503 || upstream.errorCode === "SERVICE_DISABLED") {
       return new AppraisalProviderError(
         "service_disabled",
-        "The AfaMax calculation service is temporarily unavailable.",
+        "The AfAMax calculation service is temporarily unavailable.",
       );
     }
     return new AppraisalProviderError(
       "upstream_error",
-      `AfaMax returned HTTP ${response.status}.`,
+      `AfAMax returned HTTP ${response.status}.`,
     );
   }
 }

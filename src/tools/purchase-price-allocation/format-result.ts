@@ -16,7 +16,7 @@ export function formatPurchasePriceAllocationResult(
   const applied = result.applied;
   const lines = [
     formatSourceLine(result.attribution),
-    `AfaMax applies the ${applied.method} method, with a ${(applied.buildingShare * 100).toFixed(2)}% ` +
+    `AfAMax applies the ${applied.method} method, with a ${(applied.buildingShare * 100).toFixed(2)}% ` +
       `building share and a depreciation base of ${eur.format(applied.depreciationBase)}.`,
   ];
 

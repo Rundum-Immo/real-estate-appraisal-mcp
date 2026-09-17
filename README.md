@@ -1,6 +1,6 @@
 # Rundum Immo Real Estate Appraisal MCP
 
-An open-source Model Context Protocol server for indicative German real-estate depreciation and purchase-price allocation. It exposes `calculate_property_depreciation` and `calculate_purchase_price_allocation`, delegating both calculations to the public [AfaMax](https://afamax.de) APIs. Proprietary appraisal formulas remain in AFAMAX.
+An open-source Model Context Protocol server for indicative German real-estate depreciation and purchase-price allocation. It exposes `calculate_property_depreciation` and `calculate_purchase_price_allocation`, delegating both calculations to the public [AfAMax](https://afamax.de) APIs. Proprietary appraisal formulas remain in AfAMax.
 
 <!-- mcp-name: immo.rundum/real-estate-appraisal -->
 
@@ -12,7 +12,7 @@ The public Streamable HTTP endpoint is:
 https://mcp.rundum.immo/mcp
 ```
 
-No end-user API key is required. Calls are subject to AFAMAX per-client and service-wide rate limits and abuse protections.
+No end-user API key is required. Calls are subject to AfAMax per-client and service-wide rate limits and abuse protections.
 
 ## Run from source over stdio
 
@@ -38,7 +38,7 @@ Configure your MCP client to run the built server, replacing the path with the a
 }
 ```
 
-The stdio server calls the anonymous AFAMAX API directly. Its public limits are 30 requests per minute and 500 requests per rolling day per IP; a tenant-wide ceiling may also apply. It writes protocol messages only to stdout and operational logs only to stderr.
+The stdio server calls the anonymous AfAMax API directly. Its public limits are 30 requests per minute and 500 requests per rolling day per IP; a tenant-wide ceiling may also apply. It writes protocol messages only to stdout and operational logs only to stderr.
 
 ## Install from npm over stdio
 
@@ -59,13 +59,13 @@ Node.js 22.12 or newer is required. Configure your MCP client to launch the publ
 
 ### Property depreciation
 
-`calculate_property_depreciation` accepts the complete public AFAMAX request contract:
+`calculate_property_depreciation` accepts the complete public AfAMax request contract:
 
 - Required: property type, construction year, and floor area.
 - Optional: purchase price, land area, standard land value, inventory, purchase costs, core-renovation year, marginal tax rate, locale, coarse modernization level, and eight detailed modernization component states.
 - Results: annual and monthly AfA, comparison with statutory AfA, estimated tax savings, building-value assumptions, modernization points, and remaining useful life.
 
-Omitting modernization data means AFAMAX assumes no modernization, producing an upper-bound estimate. For multi-unit buildings, provide whole-building figures or calculate individual units separately. Results are indicative and do not replace tax, legal, or appraisal advice.
+Omitting modernization data means AfAMax assumes no modernization, producing an upper-bound estimate. For multi-unit buildings, provide whole-building figures or calculate individual units separately. Results are indicative and do not replace tax, legal, or appraisal advice.
 
 Example input:
 
@@ -115,7 +115,7 @@ Example input:
 ## Architecture
 
 ```text
-MCP client  ->  this public adapter  ->  AFAMAX public HTTPS API
+MCP client  ->  this public adapter  ->  AfAMax public HTTPS API
 ```
 
 This repository contains transport, validation, error mapping, and presentation code only. It contains no appraisal formulas, databases, tenant logic, or report-generation internals. The transport-neutral server factory is shared by stdio and stateless Streamable HTTP.
@@ -138,7 +138,7 @@ npx -y @modelcontextprotocol/inspector \
   node --env-file-if-exists=.env dist/transports/stdio.js
 ```
 
-Connect in the browser, open **Tools**, and call either tool with its example input above. Successful responses contain a readable summary, structured output, disclosed assumptions/defaults, and a source link to the corresponding AfaMax calculator. The source link carries the submitted inputs so the calculator opens prefilled for refinement or documentation.
+Connect in the browser, open **Tools**, and call either tool with its example input above. Successful responses contain a readable summary, structured output, disclosed assumptions/defaults, and a source link to the corresponding AfAMax calculator. The source link carries the submitted inputs so the calculator opens prefilled for refinement or documentation.
 
 To inspect the registered tools from the command line:
 
@@ -156,7 +156,7 @@ cp .env.example .env
 pnpm dev:http
 ```
 
-`AFAMAX_SERVICE_TOKEN` is mandatory for HTTP mode. Trusted per-client rate limiting works only with a service credential issued by Rundum Immo and configured with the matching AFAMAX backend value; arbitrary tokens do not enable trusted forwarding. HTTP mode forwards that token and the validated rightmost proxy client address in `X-Afamax-Service-Token` and `X-Afamax-Client-IP`. Never expose this token to MCP clients. Deploy behind a proxy that replaces, rather than blindly appends to, incoming forwarding headers.
+`AFAMAX_SERVICE_TOKEN` is mandatory for HTTP mode. Trusted per-client rate limiting works only with a service credential issued by Rundum Immo and configured with the matching AfAMax backend value; arbitrary tokens do not enable trusted forwarding. HTTP mode forwards that token and the validated rightmost proxy client address in `X-Afamax-Service-Token` and `X-Afamax-Client-IP`. Never expose this token to MCP clients. Deploy behind a proxy that replaces, rather than blindly appends to, incoming forwarding headers.
 
 Configuration:
 
@@ -175,7 +175,7 @@ The HTTP server exposes `/mcp` and `/health`, limits request bodies to 64 KiB, v
 
 ## Deploy with Docker
 
-Production HTTP hosting is intended for Rundum Immo or explicitly authorized operators because it requires a matching AFAMAX service credential. Public users can run the stdio transport without one.
+Production HTTP hosting is intended for Rundum Immo or explicitly authorized operators because it requires a matching AfAMax service credential. Public users can run the stdio transport without one.
 
 ```bash
 docker build -t real-estate-appraisal-mcp .
@@ -189,7 +189,7 @@ The image runs as the non-root `node` user. Configure `mcp.rundum.immo` in Cooli
 
 ## Data and privacy
 
-The adapter is stateless and does not persist tool inputs or raw client IP addresses. Calculation input and the client IP are sent to AFAMAX, which uses the address for abuse prevention. AFAMAX stores a salted hash of the address and limited usage metadata for 30 days; it does not store the raw address in its usage records. Avoid placing personal identifiers in tool input. See [AfaMax privacy information](https://afamax.de/datenschutz) and [SECURITY.md](SECURITY.md).
+The adapter is stateless and does not persist tool inputs or raw client IP addresses. Calculation input and the client IP are sent to AfAMax, which uses the address for abuse prevention. AfAMax stores a salted hash of the address and limited usage metadata for 30 days; it does not store the raw address in its usage records. Avoid placing personal identifiers in tool input. See [AfAMax privacy information](https://afamax.de/datenschutz) and [SECURITY.md](SECURITY.md).
 
 ## Roadmap
 
@@ -199,7 +199,7 @@ The repository can grow beyond its initial calculation tools. Potential future c
 - Appraisal and valuation-report workflows
 - Additional German real-estate tax and appraisal tools
 
-Future tools will follow the same boundary: this repository contains the public MCP integration, while proprietary appraisal logic remains in AFAMAX.
+Future tools will follow the same boundary: this repository contains the public MCP integration, while proprietary appraisal logic remains in AfAMax.
 
 ## License
 

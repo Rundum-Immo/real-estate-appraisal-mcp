@@ -1,4 +1,4 @@
-name: AFAMAX contract drift
+name: AfAMax contract drift
 
 on:
   workflow_dispatch:
