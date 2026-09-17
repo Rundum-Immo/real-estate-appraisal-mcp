@@ -9,7 +9,7 @@ import { registerPurchasePriceAllocationTool } from "./tools/purchase-price-allo
 
 export const serverInfo = {
   name: "immo.rundum/real-estate-appraisal",
-  version: "0.1.0",
+  version: "0.1.1",
 } as const;
 
 export interface CreateServerOptions {

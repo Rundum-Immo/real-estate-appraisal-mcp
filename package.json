@@ -1,6 +1,6 @@
 {
   "name": "@rundum-immo/real-estate-appraisal-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server for German real-estate depreciation and purchase-price allocation powered by AfAMax",
   "type": "module",
   "license": "MIT",
@@ -13,7 +13,14 @@
   "bugs": {
     "url": "https://github.com/Rundum-Immo/real-estate-appraisal-mcp/issues"
   },
-  "keywords": ["mcp", "real-estate", "depreciation", "afa", "kaufpreisaufteilung", "germany"],
+  "keywords": [
+    "mcp",
+    "real-estate",
+    "depreciation",
+    "afa",
+    "kaufpreisaufteilung",
+    "germany"
+  ],
   "mcpName": "immo.rundum/real-estate-appraisal",
   "engines": {
     "node": ">=22.12.0"
@@ -21,7 +28,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "bin": {
     "real-estate-appraisal-mcp": "dist/transports/stdio.js"
   },

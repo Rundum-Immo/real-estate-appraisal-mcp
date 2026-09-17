@@ -154,7 +154,7 @@ export function createHttpServer({
       sendJson(response, 200, {
         status: "ok",
         service: "real-estate-appraisal-mcp",
-        version: "0.1.0",
+        version: "0.1.1",
       });
       return;
     }

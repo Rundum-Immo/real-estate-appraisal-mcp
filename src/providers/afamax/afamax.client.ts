@@ -92,7 +92,7 @@ export class AfamaxClient {
     const headers = new Headers({
       accept: "application/json",
       "content-type": "application/json",
-      "user-agent": "@rundum-immo/real-estate-appraisal-mcp/0.1.0",
+      "user-agent": "@rundum-immo/real-estate-appraisal-mcp/0.1.1",
     });
     if (this.#serviceToken) {
       headers.set("x-afamax-service-token", this.#serviceToken);

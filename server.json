@@ -3,7 +3,7 @@
   "name": "immo.rundum/real-estate-appraisal",
   "title": "Rundum Immo Real Estate Appraisal",
   "description": "Indicative German property depreciation, useful life, and purchase-price allocation via AfAMax.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "websiteUrl": "https://afamax.de",
   "repository": {
     "url": "https://github.com/Rundum-Immo/real-estate-appraisal-mcp",
@@ -13,7 +13,7 @@
     {
       "registryType": "npm",
       "identifier": "@rundum-immo/real-estate-appraisal-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": { "type": "stdio" }
     }
   ],
