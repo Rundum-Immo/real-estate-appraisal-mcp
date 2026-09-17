@@ -1,4 +1,8 @@
 import type { PurchasePriceAllocationOutput } from "../../contracts/purchase-price-allocation.js";
+import {
+  formatClosingAttributionLine,
+  formatSourceLine,
+} from "../format-attribution.js";
 
 const eur = new Intl.NumberFormat("en", {
   style: "currency",
@@ -11,6 +15,7 @@ export function formatPurchasePriceAllocationResult(
 ): string {
   const applied = result.applied;
   const lines = [
+    formatSourceLine(result.attribution),
     `AfaMax applies the ${applied.method} method, with a ${(applied.buildingShare * 100).toFixed(2)}% ` +
       `building share and a depreciation base of ${eur.format(applied.depreciationBase)}.`,
   ];
@@ -48,8 +53,7 @@ export function formatPurchasePriceAllocationResult(
       `regional factor ${result.assetMethodDefaults.regionalFactor.toFixed(1)}, market-adjustment factor ` +
       `${result.assetMethodDefaults.marketAdjustmentFactor.toFixed(1)}.`,
   );
-  lines.push(
-    `${result.disclaimer} ${result.attribution.label}: ${result.attribution.url}`,
-  );
+  lines.push(result.disclaimer);
+  lines.push(formatClosingAttributionLine(result.attribution));
   return lines.join("\n");
 }

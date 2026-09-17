@@ -82,12 +82,14 @@ export const purchasePriceAllocationInputSchema = z
     ).describe(
       "Co-ownership denominator; required with the numerator for a condominium.",
     ),
-    garages: optionalCount("Number of enclosed garage spaces. Defaults to 0."),
+    garages: optionalCount(
+      "Number of above-ground garages. Improves the asset-method allocation by valuing parking separately. Ask the user if the property includes garages.",
+    ),
     undergroundParkingSpaces: optionalCount(
-      "Number of underground parking spaces. Defaults to 0.",
+      "Number of covered underground parking spaces. Improves the asset-method allocation by valuing parking separately. Ask the user if the property includes underground parking.",
     ),
     monthlyNetColdRent: optionalAmount(
-      "Total monthly net cold rent in EUR. A positive value enables the income method; omitting or passing 0 leaves it unavailable.",
+      "Monthly net cold rent (base rent excluding utilities, in EUR). Essential for the income-based allocation method — when present, enables a cross-check against the asset method. Ask the user if the property is rented or if they know the rental value.",
     ),
     locale: nullAsAbsent(
       z.enum(["de", "en"]).optional().default("de"),

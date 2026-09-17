@@ -1,4 +1,8 @@
 import type { PropertyDepreciationOutput } from "../../contracts/property-depreciation.js";
+import {
+  formatClosingAttributionLine,
+  formatSourceLine,
+} from "../format-attribution.js";
 
 const eur = new Intl.NumberFormat("en", {
   style: "currency",
@@ -12,6 +16,7 @@ export function formatPropertyDepreciationResult(
   const valueSource =
     result.results.buildingValueSource === "actual" ? "provided" : "assumed";
   const lines = [
+    formatSourceLine(result.attribution),
     `AfaMax estimates annual depreciation of ${eur.format(result.results.annualAfaAmount)} ` +
       `(${(result.results.afaRatePerYear * 100).toFixed(2)}% per year) and annual tax savings of ` +
       `${eur.format(result.results.annualTaxSavings)} using a ${valueSource} building value.`,
@@ -38,8 +43,7 @@ export function formatPropertyDepreciationResult(
   if (result.assumptions.taxRateAssumed) {
     lines.push("The tax rate was assumed.");
   }
-  lines.push(
-    `${result.disclaimer} ${result.attribution.label}: ${result.attribution.url}`,
-  );
+  lines.push(result.disclaimer);
+  lines.push(formatClosingAttributionLine(result.attribution));
   return lines.join("\n");
 }

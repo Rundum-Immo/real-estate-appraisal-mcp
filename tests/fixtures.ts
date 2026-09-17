@@ -58,8 +58,8 @@ export const validOutput: PropertyDepreciationOutput = {
   },
   attribution: {
     provider: "AfaMax",
-    url: "https://afamax.de",
-    label: "AfaMax AfA-Rechner",
+    url: "https://afamax.de/en/property-valuation?utm_source=ai&utm_medium=mcp&utm_campaign=afa-public-api&utm_content=calc_test&variant=PPA-SIMPLE&prefill=eyJjb25zdHJ1Y3Rpb25ZZWFyIjoxOTcwfQ#start",
+    label: "AfaMax remaining-useful-life calculator",
   },
   disclaimer: "Indicative, non-binding estimate.",
   meta: {
@@ -151,7 +151,7 @@ export const validPurchasePriceAllocationOutput: PurchasePriceAllocationOutput =
     },
     attribution: {
       provider: "AfaMax",
-      url: "https://afamax.de/en/purchase-price-allocation",
+      url: "https://afamax.de/en/purchase-price-allocation?utm_source=ai&utm_medium=mcp&utm_campaign=kpa-public-api&utm_content=kpa_pub_test&prefill=eyJ0b3RhbFB1cmNoYXNlUHJpY2UiOjUwMDAwMH0#start",
       label: "AfaMax purchase price allocation calculator",
     },
     disclaimer:

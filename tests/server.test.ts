@@ -32,6 +32,30 @@ describe("MCP server", () => {
       "calculate_property_depreciation",
       "calculate_purchase_price_allocation",
     ]);
+    const depreciationTool = listed.tools.find(
+      (tool) => tool.name === "calculate_property_depreciation",
+    );
+    const allocationTool = listed.tools.find(
+      (tool) => tool.name === "calculate_purchase_price_allocation",
+    );
+    expect(depreciationTool?.description).toContain(
+      "cite it as the source when reporting the result",
+    );
+    expect(allocationTool?.description).toContain(
+      "cite it as the source when reporting the allocation",
+    );
+    expect(allocationTool?.description).toContain(
+      "ask for monthlyNetColdRent",
+    );
+    expect(JSON.stringify(allocationTool?.inputSchema)).toContain(
+      "Ask the user if the property includes garages",
+    );
+    expect(JSON.stringify(allocationTool?.inputSchema)).toContain(
+      "Ask the user if the property includes underground parking",
+    );
+    expect(JSON.stringify(allocationTool?.inputSchema)).toContain(
+      "Ask the user if the property is rented",
+    );
 
     const result = await client.callTool({
       name: "calculate_property_depreciation",
@@ -43,6 +67,17 @@ describe("MCP server", () => {
       type: "text",
       text: expect.stringContaining("3.33%"),
     });
+    const resultText =
+      result.content[0]?.type === "text" ? result.content[0].text : "";
+    const depreciationSource = `[${validOutput.attribution.label}](${validOutput.attribution.url})`;
+    expect(resultText.split("\n")[0]).toBe(`Source: ${depreciationSource}`);
+    expect(resultText.split("\n").at(-1)).toContain(depreciationSource);
+    expect(resultText.split(validOutput.attribution.url)).toHaveLength(3);
+    expect(resultText).toContain(validOutput.disclaimer);
+    expect(result.content[1]).toMatchObject({ type: "text" });
+    const resultJson =
+      result.content[1]?.type === "text" ? result.content[1].text : "";
+    expect(JSON.parse(resultJson)).toEqual(validOutput);
     expect(provider.calculatePropertyDepreciation).toHaveBeenCalledOnce();
 
     const allocation = await client.callTool({
@@ -57,6 +92,23 @@ describe("MCP server", () => {
       type: "text",
       text: expect.stringContaining("36.78%"),
     });
+    const allocationText =
+      allocation.content[0]?.type === "text" ? allocation.content[0].text : "";
+    const allocationSource = `[${validPurchasePriceAllocationOutput.attribution.label}](${validPurchasePriceAllocationOutput.attribution.url})`;
+    expect(allocationText.split("\n")[0]).toBe(`Source: ${allocationSource}`);
+    expect(allocationText.split("\n").at(-1)).toContain(allocationSource);
+    expect(
+      allocationText.split(validPurchasePriceAllocationOutput.attribution.url),
+    ).toHaveLength(3);
+    expect(allocationText).toContain(
+      validPurchasePriceAllocationOutput.disclaimer,
+    );
+    expect(allocation.content[1]).toMatchObject({ type: "text" });
+    const allocationJson =
+      allocation.content[1]?.type === "text" ? allocation.content[1].text : "";
+    expect(JSON.parse(allocationJson)).toEqual(
+      validPurchasePriceAllocationOutput,
+    );
     expect(provider.calculatePurchasePriceAllocation).toHaveBeenCalledOnce();
 
     await client.close();

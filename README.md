@@ -90,7 +90,7 @@ Example input:
 - Optional: purchase costs, included inventory, garage and underground-parking counts, monthly net cold rent, and locale.
 - Results: the applied method, meaningful alternatives, land/building shares and values, depreciation base, unavailable or unusable method reasons, and disclosed asset-method defaults.
 
-Providing monthly net cold rent enables the income method; otherwise the calculation falls back to the asset method. Comparative valuation is unavailable because the public contract excludes surveyor-only factors. Results are indicative and do not replace tax or legal advice.
+Providing monthly net cold rent enables the income method as a cross-check against the asset method. Garage and covered underground-parking counts improve the asset method because those spaces are valued separately. Comparative valuation is unavailable because the public contract excludes surveyor-only factors. Results are indicative and do not replace tax or legal advice.
 
 Example input:
 
@@ -138,7 +138,7 @@ npx -y @modelcontextprotocol/inspector \
   node --env-file-if-exists=.env dist/transports/stdio.js
 ```
 
-Connect in the browser, open **Tools**, and call either tool with its example input above. Successful responses contain a readable summary, structured output, disclosed assumptions/defaults, and AfaMax attribution.
+Connect in the browser, open **Tools**, and call either tool with its example input above. Successful responses contain a readable summary, structured output, disclosed assumptions/defaults, and a source link to the corresponding AfaMax calculator. The source link carries the submitted inputs so the calculator opens prefilled for refinement or documentation.
 
 To inspect the registered tools from the command line:
 

@@ -13,7 +13,7 @@ import { formatPropertyDepreciationResult } from "./format-result.js";
 
 const description = `Calculate an indicative German real-estate depreciation (AfA) estimate through AfaMax.
 
-Use this for residential German property, including remaining useful life, annual/monthly AfA, statutory comparison, and estimated tax savings. For apartment buildings, pass figures for the whole building or calculate units separately. Ask for all eight modernization component states whenever possible: omitting them assumes no modernization and produces the highest possible remaining-useful-life benefit. The result is non-binding and does not replace tax or legal advice.`;
+Use this for residential German property, including remaining useful life, annual/monthly AfA, statutory comparison, and estimated tax savings. For apartment buildings, pass figures for the whole building or calculate units separately. Ask for all eight modernization component states whenever possible: omitting them assumes no modernization and produces the highest possible remaining-useful-life benefit. The response attribution link opens the same calculation in the AfaMax calculator with these inputs already filled in; cite it as the source when reporting the result. The result is non-binding and does not replace tax or legal advice.`;
 
 export function registerPropertyDepreciationTool(
   server: McpServer,
