@@ -1,11 +1,8 @@
 import { z } from "zod";
 import { propertyTypes } from "./property-depreciation.js";
+import { attributionSchema, nullAsAbsent } from "./schema-helpers.js";
 
 const requiredNumber = { error: "Required — must be a number" } as const;
-
-function nullAsAbsent<T extends z.ZodType>(schema: T) {
-  return z.preprocess((value) => (value === null ? undefined : value), schema);
-}
 
 const optionalAmount = (description: string) =>
   nullAsAbsent(z.coerce.number().nonnegative().optional()).describe(
@@ -254,13 +251,7 @@ export const purchasePriceAllocationOutputSchema = z
         marketAdjustmentFactor: z.literal(1),
       })
       .strict(),
-    attribution: z
-      .object({
-        provider: z.literal("AfaMax"),
-        url: z.url(),
-        label: z.string(),
-      })
-      .strict(),
+    attribution: attributionSchema,
     disclaimer: z.string(),
     meta: z
       .object({

@@ -8,6 +8,9 @@ export function createDependencies(config: AppConfig) {
   const clientOptions = {
     apiUrl: config.afamaxApiUrl,
     purchasePriceAllocationApiUrl: config.afamaxKpaApiUrl,
+    priceQuoteApiUrl: config.afamaxPriceQuoteApiUrl,
+    appointmentAvailabilityApiUrl: config.afamaxAppointmentAvailabilityApiUrl,
+    appointmentBookingApiUrl: config.afamaxAppointmentBookingApiUrl,
     timeoutMs: config.afamaxTimeoutMs,
     ...(config.afamaxServiceToken
       ? { serviceToken: config.afamaxServiceToken }

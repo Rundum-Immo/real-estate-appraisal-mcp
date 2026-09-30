@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { attributionProviderSchema } from "./schema-helpers.js";
 
 export const propertyTypes = [
   "CONDOMINIUM",
@@ -174,7 +175,7 @@ export const propertyDepreciationOutputSchema = z
       taxRateAssumed: z.boolean(),
     }),
     attribution: z.object({
-      provider: z.literal("AfaMax"),
+      provider: attributionProviderSchema,
       url: z.url(),
       label: z.string(),
     }),

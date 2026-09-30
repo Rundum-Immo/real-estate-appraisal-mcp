@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   propertyDepreciationOutputSchema,
   type PropertyDepreciationInput,
@@ -9,13 +10,31 @@ import {
   type PurchasePriceAllocationOutput,
 } from "../../contracts/purchase-price-allocation.js";
 import {
+  priceQuoteOutputSchema,
+  type PriceQuoteInput,
+  type PriceQuoteOutput,
+} from "../../contracts/price-quote.js";
+import {
+  appointmentAvailabilityOutputSchema,
+  bookingOutputSchema,
+  type AppointmentAvailabilityInput,
+  type AppointmentAvailabilityOutput,
+  type BookingInput,
+  type BookingOutput,
+} from "../../contracts/appointments.js";
+import {
   AppraisalProviderError,
   type AppraisalRequestContext,
+  type UpstreamRefusal,
 } from "../appraisal-provider.js";
+import { packageVersion } from "../../version.js";
 
 export interface AfamaxClientOptions {
   apiUrl: URL;
   purchasePriceAllocationApiUrl: URL;
+  priceQuoteApiUrl: URL;
+  appointmentAvailabilityApiUrl: URL;
+  appointmentBookingApiUrl: URL;
   timeoutMs: number;
   serviceToken?: string;
   fetch?: typeof globalThis.fetch;
@@ -24,13 +43,24 @@ export interface AfamaxClientOptions {
 interface UpstreamErrorBody {
   errorCode?: unknown;
   errorMessage?: unknown;
+  fallbackUrl?: unknown;
+}
+
+interface RequestOptions {
+  method: "GET" | "POST";
+  body?: unknown;
 }
 
 const maxResponseBytes = 256 * 1024;
+const maxRefusalMessageLength = 300;
+const upstreamCodePattern = /^[A-Z][A-Z0-9_]{1,63}$/;
 
 export class AfamaxClient {
   readonly #apiUrl: URL;
   readonly #purchasePriceAllocationApiUrl: URL;
+  readonly #priceQuoteApiUrl: URL;
+  readonly #appointmentAvailabilityApiUrl: URL;
+  readonly #appointmentBookingApiUrl: URL;
   readonly #timeoutMs: number;
   readonly #serviceToken: string | undefined;
   readonly #fetch: typeof globalThis.fetch;
@@ -38,6 +68,9 @@ export class AfamaxClient {
   constructor(options: AfamaxClientOptions) {
     this.#apiUrl = options.apiUrl;
     this.#purchasePriceAllocationApiUrl = options.purchasePriceAllocationApiUrl;
+    this.#priceQuoteApiUrl = options.priceQuoteApiUrl;
+    this.#appointmentAvailabilityApiUrl = options.appointmentAvailabilityApiUrl;
+    this.#appointmentBookingApiUrl = options.appointmentBookingApiUrl;
     this.#timeoutMs = options.timeoutMs;
     this.#serviceToken = options.serviceToken;
     this.#fetch = options.fetch ?? globalThis.fetch;
@@ -47,15 +80,12 @@ export class AfamaxClient {
     input: PropertyDepreciationInput,
     context: AppraisalRequestContext = {},
   ): Promise<PropertyDepreciationOutput> {
-    const body = await this.#request(this.#apiUrl, input, context);
-    const result = propertyDepreciationOutputSchema.safeParse(body);
-    if (!result.success) {
-      throw new AppraisalProviderError(
-        "invalid_response",
-        "AfAMax returned a response that does not match the public API contract.",
-      );
-    }
-    return result.data;
+    const body = await this.#request(
+      this.#apiUrl,
+      { method: "POST", body: input },
+      context,
+    );
+    return parseContract(propertyDepreciationOutputSchema, body);
   }
 
   async calculatePurchasePriceAllocation(
@@ -64,22 +94,51 @@ export class AfamaxClient {
   ): Promise<PurchasePriceAllocationOutput> {
     const body = await this.#request(
       this.#purchasePriceAllocationApiUrl,
-      input,
+      { method: "POST", body: input },
       context,
     );
-    const result = purchasePriceAllocationOutputSchema.safeParse(body);
-    if (!result.success) {
-      throw new AppraisalProviderError(
-        "invalid_response",
-        "AfAMax returned a response that does not match the public API contract.",
-      );
+    return parseContract(purchasePriceAllocationOutputSchema, body);
+  }
+
+  async priceQuote(
+    input: PriceQuoteInput,
+    context: AppraisalRequestContext = {},
+  ): Promise<PriceQuoteOutput> {
+    const body = await this.#request(
+      this.#priceQuoteApiUrl,
+      { method: "POST", body: input },
+      context,
+    );
+    return parseContract(priceQuoteOutputSchema, body);
+  }
+
+  async availableAppointments(
+    input: AppointmentAvailabilityInput,
+    context: AppraisalRequestContext = {},
+  ): Promise<AppointmentAvailabilityOutput> {
+    const url = new URL(this.#appointmentAvailabilityApiUrl);
+    for (const [key, value] of Object.entries(input)) {
+      if (value !== undefined) url.searchParams.set(key, String(value));
     }
-    return result.data;
+    const body = await this.#request(url, { method: "GET" }, context);
+    return parseContract(appointmentAvailabilityOutputSchema, body);
+  }
+
+  async bookAppointment(
+    input: BookingInput,
+    context: AppraisalRequestContext = {},
+  ): Promise<BookingOutput> {
+    const body = await this.#request(
+      this.#appointmentBookingApiUrl,
+      { method: "POST", body: input },
+      context,
+    );
+    return parseContract(bookingOutputSchema, body);
   }
 
   async #request(
     apiUrl: URL,
-    input: unknown,
+    request: RequestOptions,
     context: AppraisalRequestContext,
   ): Promise<unknown> {
     if (this.#serviceToken && !context.clientIp) {
@@ -91,9 +150,11 @@ export class AfamaxClient {
 
     const headers = new Headers({
       accept: "application/json",
-      "content-type": "application/json",
-      "user-agent": "@rundum-immo/real-estate-appraisal-mcp/0.1.1",
+      "user-agent": `@rundum-immo/real-estate-appraisal-mcp/${packageVersion}`,
     });
+    if (request.body !== undefined) {
+      headers.set("content-type", "application/json");
+    }
     if (this.#serviceToken) {
       headers.set("x-afamax-service-token", this.#serviceToken);
       headers.set("x-afamax-client-ip", context.clientIp!);
@@ -102,9 +163,11 @@ export class AfamaxClient {
     let response: Response;
     try {
       response = await this.#fetch(apiUrl, {
-        method: "POST",
+        method: request.method,
         headers,
-        body: JSON.stringify(input),
+        ...(request.body !== undefined && {
+          body: JSON.stringify(request.body),
+        }),
         signal: AbortSignal.timeout(this.#timeoutMs),
       });
     } catch (error) {
@@ -164,12 +227,14 @@ export class AfamaxClient {
     const retryAfterSeconds = Number.isFinite(retryAfter)
       ? retryAfter
       : undefined;
+    const refusal = readRefusal(upstream);
 
     if (response.status === 429 || upstream.errorCode === "RATE_LIMITED") {
       return new AppraisalProviderError(
         "rate_limited",
         "AfAMax rate limit reached. Please try again later.",
         retryAfterSeconds,
+        refusal,
       );
     }
     if (response.status === 422 || upstream.errorCode === "VALIDATION_FAILED") {
@@ -181,7 +246,24 @@ export class AfamaxClient {
     if (response.status === 503 || upstream.errorCode === "SERVICE_DISABLED") {
       return new AppraisalProviderError(
         "service_disabled",
-        "The AfAMax calculation service is temporarily unavailable.",
+        "The AfAMax service is temporarily unavailable.",
+        undefined,
+        refusal,
+      );
+    }
+    // Actionable refusals (slot taken, wrong code) carry AfAMax's public message; pass it on.
+    if (
+      response.status >= 400 &&
+      response.status < 500 &&
+      refusal.upstreamCode &&
+      typeof upstream.errorMessage === "string" &&
+      upstream.errorMessage.length <= maxRefusalMessageLength
+    ) {
+      return new AppraisalProviderError(
+        "upstream_refused",
+        upstream.errorMessage,
+        retryAfterSeconds,
+        refusal,
       );
     }
     return new AppraisalProviderError(
@@ -189,4 +271,33 @@ export class AfamaxClient {
       `AfAMax returned HTTP ${response.status}.`,
     );
   }
+}
+
+function parseContract<T extends z.ZodType>(
+  schema: T,
+  body: unknown,
+): z.infer<T> {
+  const result = schema.safeParse(body);
+  if (!result.success) {
+    throw new AppraisalProviderError(
+      "invalid_response",
+      "AfAMax returned a response that does not match the public API contract.",
+    );
+  }
+  return result.data;
+}
+
+function readRefusal(upstream: UpstreamErrorBody): UpstreamRefusal {
+  const refusal: UpstreamRefusal = {};
+  if (
+    typeof upstream.errorCode === "string" &&
+    upstreamCodePattern.test(upstream.errorCode)
+  ) {
+    refusal.upstreamCode = upstream.errorCode;
+  }
+  const fallbackUrl = z
+    .url({ protocol: /^https?$/ })
+    .safeParse(upstream.fallbackUrl);
+  if (fallbackUrl.success) refusal.fallbackUrl = fallbackUrl.data;
+  return refusal;
 }

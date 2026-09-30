@@ -92,6 +92,79 @@ const expectedKpaMethodProperties = [
   "currency",
 ];
 
+const expectedPriceRequestProperties = [
+  "product",
+  "viewingType",
+  "expressDelivery",
+  "propertyType",
+  "totalFlatsCount",
+  "locale",
+];
+const expectedPriceResponseProperties = [
+  "quoteId",
+  "product",
+  "productLabel",
+  "currency",
+  "input",
+  "price",
+  "surchargeTable",
+  "attribution",
+  "disclaimer",
+  "meta",
+];
+const expectedPriceProperties = [
+  "basePrice",
+  "viewingSurcharge",
+  "expressSurcharge",
+  "freeExpressPromotionApplied",
+  "additionalPricePerUnit",
+  "additionalUnitsPrice",
+  "totalPrice",
+  "vatIncluded",
+  "vatRate",
+  "totalNetPrice",
+];
+const expectedPriceProducts = [
+  "rnd",
+  "kurzgutachten",
+  "vollgutachten",
+  "kaufpreisaufteilung",
+  "versetzbarkeitsgutachten",
+];
+const expectedAvailabilityParameters = [
+  "from",
+  "days",
+  "maxSlotsPerDay",
+  "locale",
+];
+const expectedAvailabilityResponseProperties = [
+  "requestId",
+  "appointmentType",
+  "description",
+  "days",
+  "timeZone",
+  "durationMinutes",
+  "attribution",
+  "meta",
+];
+const expectedBookingRequestProperties = [
+  "startDateTime",
+  "name",
+  "email",
+  "phone",
+  "verificationId",
+  "otp",
+  "locale",
+];
+const expectedBookingResponseProperties = [
+  "requestId",
+  "status",
+  "verification",
+  "appointment",
+  "attribution",
+  "meta",
+];
+
 type JsonObject = Record<string, unknown>;
 
 function asObject(value: unknown, label: string): JsonObject {
@@ -128,7 +201,13 @@ if (!response.ok)
 
 const document = asObject(await response.json(), "OpenAPI document");
 const paths = asObject(document.paths, "paths");
-for (const path of ["/v1/afa-calculation", "/v1/purchase-price-allocation"]) {
+for (const path of [
+  "/v1/afa-calculation",
+  "/v1/purchase-price-allocation",
+  "/v1/price-quote",
+  "/v1/appointments/availability",
+  "/v1/appointments/book",
+]) {
   if (!(path in paths)) throw new Error(`OpenAPI path is missing: ${path}`);
 }
 const components = asObject(document.components, "components");
@@ -246,6 +325,79 @@ assertSameMembers(
   ),
   ["standardLevel", "regionalFactor", "marketAdjustmentFactor"],
   "KPA asset default properties",
+);
+
+const priceRequestSchema = asObject(
+  schemas.PublicPriceQuoteRequest,
+  "PublicPriceQuoteRequest",
+);
+const priceRequestProperties = properties(
+  priceRequestSchema,
+  "PublicPriceQuoteRequest",
+);
+const priceResponseProperties = properties(
+  schemas.PublicPriceQuoteResponse,
+  "PublicPriceQuoteResponse",
+);
+assertSameMembers(
+  Object.keys(priceRequestProperties),
+  expectedPriceRequestProperties,
+  "price request properties",
+);
+assertSameMembers(
+  priceRequestSchema.required as string[],
+  ["product"],
+  "price request required fields",
+);
+assertSameMembers(
+  asObject(priceRequestProperties.product, "price product").enum as string[],
+  expectedPriceProducts,
+  "price product enum",
+);
+assertSameMembers(
+  Object.keys(priceResponseProperties),
+  expectedPriceResponseProperties,
+  "price response properties",
+);
+assertSameMembers(
+  Object.keys(properties(priceResponseProperties.price, "price.price")),
+  expectedPriceProperties,
+  "price amount properties",
+);
+
+const availabilityOperation = asObject(
+  asObject(paths["/v1/appointments/availability"], "availability path").get,
+  "availability GET",
+);
+assertSameMembers(
+  (availabilityOperation.parameters as JsonObject[]).map((parameter) =>
+    String(parameter.name),
+  ),
+  expectedAvailabilityParameters,
+  "availability query parameters",
+);
+assertSameMembers(
+  Object.keys(
+    properties(
+      schemas.PublicAppointmentAvailabilityResponse,
+      "PublicAppointmentAvailabilityResponse",
+    ),
+  ),
+  expectedAvailabilityResponseProperties,
+  "availability response properties",
+);
+
+assertSameMembers(
+  Object.keys(properties(schemas.PublicBookingRequest, "PublicBookingRequest")),
+  expectedBookingRequestProperties,
+  "booking request properties",
+);
+assertSameMembers(
+  Object.keys(
+    properties(schemas.PublicBookingResponse, "PublicBookingResponse"),
+  ),
+  expectedBookingResponseProperties,
+  "booking response properties",
 );
 
 process.stdout.write(

@@ -1,5 +1,10 @@
 import type { PropertyDepreciationOutput } from "../src/contracts/property-depreciation.js";
 import type { PurchasePriceAllocationOutput } from "../src/contracts/purchase-price-allocation.js";
+import type { PriceQuoteOutput } from "../src/contracts/price-quote.js";
+import type {
+  AppointmentAvailabilityOutput,
+  BookingOutput,
+} from "../src/contracts/appointments.js";
 
 export const validInput = {
   propertyType: "CONDOMINIUM" as const,
@@ -57,7 +62,7 @@ export const validOutput: PropertyDepreciationOutput = {
     taxRateAssumed: false,
   },
   attribution: {
-    provider: "AfaMax",
+    provider: "AfAMax",
     url: "https://afamax.de/en/property-valuation?utm_source=ai&utm_medium=mcp&utm_campaign=afa-public-api&utm_content=calc_test&variant=PPA-SIMPLE&prefill=eyJjb25zdHJ1Y3Rpb25ZZWFyIjoxOTcwfQ#start",
     label: "AfAMax remaining-useful-life calculator",
   },
@@ -150,7 +155,7 @@ export const validPurchasePriceAllocationOutput: PurchasePriceAllocationOutput =
       marketAdjustmentFactor: 1,
     },
     attribution: {
-      provider: "AfaMax",
+      provider: "AfAMax",
       url: "https://afamax.de/en/purchase-price-allocation?utm_source=ai&utm_medium=mcp&utm_campaign=kpa-public-api&utm_content=kpa_pub_test&prefill=eyJ0b3RhbFB1cmNoYXNlUHJpY2UiOjUwMDAwMH0#start",
       label: "AfAMax purchase price allocation calculator",
     },
@@ -162,3 +167,125 @@ export const validPurchasePriceAllocationOutput: PurchasePriceAllocationOutput =
       calculatedAt: "2026-09-15T10:00:00.000Z",
     },
   };
+
+export const validPriceQuoteInput = {
+  product: "rnd" as const,
+  viewingType: "interior_exterior" as const,
+  expressDelivery: true,
+  locale: "en" as const,
+};
+
+export const validPriceQuoteOutput: PriceQuoteOutput = {
+  quoteId: "prc_pub_test",
+  product: "rnd",
+  productLabel: "Remaining useful life appraisal",
+  currency: "EUR",
+  input: {
+    viewingType: "interior_exterior",
+    expressDelivery: true,
+    propertyType: null,
+    totalFlatsCount: null,
+  },
+  price: {
+    basePrice: 799,
+    viewingSurcharge: 299,
+    expressSurcharge: 149,
+    freeExpressPromotionApplied: false,
+    additionalPricePerUnit: 0,
+    additionalUnitsPrice: 0,
+    totalPrice: 1247,
+    vatIncluded: true,
+    vatRate: 19,
+    totalNetPrice: 1047.9,
+  },
+  surchargeTable: {
+    exteriorViewing: 149,
+    interiorExteriorViewing: 299,
+    express: 149,
+    perAdditionalFlat: 99,
+  },
+  attribution: {
+    provider: "AfAMax",
+    url: "https://afamax.de/en/restnutzungsdauergutachten?utm_source=ai&utm_medium=mcp&utm_campaign=price-public-api&utm_content=prc_pub_test",
+    label: "AfAMax product page",
+  },
+  disclaimer:
+    "This provider's list price in EUR incl. 19% VAT. Discount codes and special cases (e.g. individually commissioned units of a multi-family building) are not included; the price shown when commissioning is binding.",
+  meta: { apiVersion: "v1", generatedAt: "2026-09-30T10:00:00.000Z" },
+};
+
+export const validAvailabilityInput = {
+  days: 1,
+  maxSlotsPerDay: 32,
+  locale: "en" as const,
+};
+
+const contactAttribution = {
+  provider: "AfAMax" as const,
+  url: "https://afamax.de/en/contact?utm_source=ai&utm_medium=mcp&utm_campaign=appointment-public-api",
+  label: "AfAMax contact & appointment booking",
+};
+
+export const validAvailabilityOutput: AppointmentAvailabilityOutput = {
+  requestId: "apt_pub_test",
+  appointmentType: "initial_call",
+  description:
+    "Free, non-binding 15-minute initial phone call with the AfAMax team.",
+  days: [
+    {
+      date: "2026-10-01",
+      weekday: "Thu",
+      freeSlotCount: 12,
+      slots: [
+        { startDateTime: "2026-10-01T07:00:00.000Z", localTime: "09:00" },
+        { startDateTime: "2026-10-01T07:15:00.000Z", localTime: "09:15" },
+      ],
+    },
+  ],
+  timeZone: "Europe/Berlin",
+  durationMinutes: 15,
+  attribution: contactAttribution,
+  meta: { apiVersion: "v1", generatedAt: "2026-09-30T10:00:00.000Z" },
+};
+
+export const validBookingStepOneInput = {
+  startDateTime: "2026-10-01T07:00:00.000Z",
+  name: "Erika Mustermann",
+  email: "erika@example.com",
+  locale: "en" as const,
+};
+
+export const validBookingStepTwoInput = {
+  verificationId: "ver_test",
+  otp: "123456",
+};
+
+export const validVerificationRequiredOutput: BookingOutput = {
+  requestId: "apt_pub_test_1",
+  status: "verification_required",
+  verification: {
+    verificationId: "ver_test",
+    maskedEmail: "e***@example.com",
+    expiresAt: "2026-09-30T10:15:00.000Z",
+  },
+  appointment: null,
+  attribution: contactAttribution,
+  meta: { apiVersion: "v1", generatedAt: "2026-09-30T10:00:00.000Z" },
+};
+
+export const validBookedOutput: BookingOutput = {
+  requestId: "apt_pub_test_2",
+  status: "booked",
+  verification: null,
+  appointment: {
+    startDateTime: "2026-10-01T07:00:00.000Z",
+    endDateTime: "2026-10-01T07:15:00.000Z",
+    localDate: "2026-10-01",
+    localTime: "09:00",
+    timeZone: "Europe/Berlin",
+    durationMinutes: 15,
+    customerInviteSent: true,
+  },
+  attribution: contactAttribution,
+  meta: { apiVersion: "v1", generatedAt: "2026-09-30T10:01:00.000Z" },
+};

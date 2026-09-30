@@ -32,9 +32,8 @@ all of these locations:
 
 - `package.json`
 - the top-level version and npm package version in `server.json`
-- the MCP server implementation in `src/server.ts`
-- the `/health` response in `src/transports/http.ts`
-- the AfAMax user agent in `src/providers/afamax/afamax.client.ts`
+- `src/version.ts`, which feeds the MCP server info, the `/health` response
+  and the AfAMax user agent
 
 Search the repository for the previous version and confirm no runtime version
 was missed:

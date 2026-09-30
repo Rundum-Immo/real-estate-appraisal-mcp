@@ -23,6 +23,10 @@ const commonEnvironmentSchema = z.object({
 export interface AppConfig {
   afamaxApiUrl: URL;
   afamaxKpaApiUrl: URL;
+  // Derived from the origin of AFAMAX_API_URL.
+  afamaxPriceQuoteApiUrl: URL;
+  afamaxAppointmentAvailabilityApiUrl: URL;
+  afamaxAppointmentBookingApiUrl: URL;
   afamaxServiceToken?: string;
   afamaxTimeoutMs: number;
   host: string;
@@ -54,9 +58,19 @@ export function loadConfig(
     throw new Error("PUBLIC_HOSTS must contain at least one hostname");
   }
 
+  const afamaxApiUrl = new URL(parsed.AFAMAX_API_URL);
   return {
-    afamaxApiUrl: new URL(parsed.AFAMAX_API_URL),
+    afamaxApiUrl,
     afamaxKpaApiUrl: new URL(parsed.AFAMAX_KPA_API_URL),
+    afamaxPriceQuoteApiUrl: new URL("/api/v1/price-quote", afamaxApiUrl),
+    afamaxAppointmentAvailabilityApiUrl: new URL(
+      "/api/v1/appointments/availability",
+      afamaxApiUrl,
+    ),
+    afamaxAppointmentBookingApiUrl: new URL(
+      "/api/v1/appointments/book",
+      afamaxApiUrl,
+    ),
     ...(transport === "http" && parsed.AFAMAX_SERVICE_TOKEN
       ? { afamaxServiceToken: parsed.AFAMAX_SERVICE_TOKEN }
       : {}),

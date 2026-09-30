@@ -18,6 +18,7 @@ import { createDependencies } from "../bootstrap.js";
 import { loadConfig, type AppConfig } from "../config/env.js";
 import type { Logger } from "../observability/logger.js";
 import type { AppraisalProvider } from "../providers/appraisal-provider.js";
+import { packageVersion } from "../version.js";
 import { createServer } from "../server.js";
 
 const maxRequestBytes = 64 * 1024;
@@ -154,7 +155,7 @@ export function createHttpServer({
       sendJson(response, 200, {
         status: "ok",
         service: "real-estate-appraisal-mcp",
-        version: "0.1.1",
+        version: packageVersion,
       });
       return;
     }

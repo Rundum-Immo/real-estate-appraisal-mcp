@@ -1,6 +1,6 @@
 # Rundum Immo Real Estate Appraisal MCP
 
-An open-source Model Context Protocol server for indicative German real-estate depreciation and purchase-price allocation. It exposes `calculate_property_depreciation` and `calculate_purchase_price_allocation`, delegating both calculations to the public [AfAMax](https://afamax.de) APIs. Proprietary appraisal formulas remain in AfAMax.
+An open-source Model Context Protocol server for indicative German real-estate depreciation and purchase-price allocation. It exposes `calculate_property_depreciation` and `calculate_purchase_price_allocation`, delegating both calculations to the public [AfAMax](https://afamax.de) APIs, plus `get_price_by_product`, `get_available_appointments`, and `book_appointment` for AfAMax appraisal prices and free initial-call bookings. Proprietary appraisal formulas remain in AfAMax.
 
 <!-- mcp-name: immo.rundum/real-estate-appraisal -->
 
@@ -112,6 +112,34 @@ Example input:
 }
 ```
 
+### Appraisal prices
+
+`get_price_by_product` returns the current AfAMax list price in EUR, including German VAT, for one product: `rnd` (Restnutzungsdauergutachten), `kurzgutachten`, `vollgutachten`, `kaufpreisaufteilung`, or `versetzbarkeitsgutachten`.
+
+- Optional: property inspection (`none`, `exterior`, `interior_exterior`), express processing, and property type with flat count for the per-flat price of multi-unit buildings.
+- Results: the total with its breakdown, net price, a table of every surcharge for comparing options, and a source link to the product page.
+
+Discount codes are not applied; the price shown when ordering is binding.
+
+```json
+{ "product": "rnd", "viewingType": "interior_exterior", "expressDelivery": true, "locale": "en" }
+```
+
+### Initial-call appointments
+
+`get_available_appointments` lists open slots for a free, non-binding 15-minute phone call with the AfAMax team, on weekdays in Europe/Berlin, grouped by day. It looks up to 21 days ahead (default 7) and lists up to 32 slots per day (default 8), with each day's full free-slot count.
+
+```json
+{ "days": 1, "maxSlotsPerDay": 32, "locale": "en" }
+```
+
+`book_appointment` books one of those slots in two steps, so a booking is confirmed only by someone with access to the given mailbox:
+
+1. Call with the slot's `startDateTime`, `name`, `email` (optionally `phone`, `locale`). AfAMax e-mails a 6-digit code and returns a `verificationId`.
+2. Call again with only `verificationId` and the `otp` the user read from the e-mail. The response confirms the booking and AfAMax sends a calendar invitation.
+
+Codes expire after 15 minutes and allow 5 attempts. Refusals such as a slot taken meanwhile or an e-mail that belongs to an existing AfAMax account come back with what to do next and a link to continue on the AfAMax website.
+
 ## Architecture
 
 ```text
@@ -138,7 +166,7 @@ npx -y @modelcontextprotocol/inspector \
   node --env-file-if-exists=.env dist/transports/stdio.js
 ```
 
-Connect in the browser, open **Tools**, and call either tool with its example input above. Successful responses contain a readable summary, structured output, disclosed assumptions/defaults, and a source link to the corresponding AfAMax calculator. The source link carries the submitted inputs so the calculator opens prefilled for refinement or documentation.
+Connect in the browser, open **Tools**, and call a calculation tool with its example input above. Successful responses contain a readable summary, structured output, disclosed assumptions/defaults, and a source link to the corresponding AfAMax calculator. The source link carries the submitted inputs so the calculator opens prefilled for refinement or documentation.
 
 To inspect the registered tools from the command line:
 
@@ -189,11 +217,11 @@ The image runs as the non-root `node` user. Configure `mcp.rundum.immo` in Cooli
 
 ## Data and privacy
 
-The adapter is stateless and does not persist tool inputs or raw client IP addresses. Calculation input and the client IP are sent to AfAMax, which uses the address for abuse prevention. AfAMax stores a salted hash of the address and limited usage metadata for 30 days; it does not store the raw address in its usage records. Avoid placing personal identifiers in tool input. See [AfAMax privacy information](https://afamax.de/datenschutz) and [SECURITY.md](SECURITY.md).
+The adapter is stateless and does not persist tool inputs or raw client IP addresses. Calculation input and the client IP are sent to AfAMax, which uses the address for abuse prevention. AfAMax stores a salted hash of the address and limited usage metadata for 30 days; it does not store the raw address in its usage records. Avoid placing personal identifiers in calculation and price inputs. `book_appointment` necessarily sends the user's name, e-mail address, and optional phone number to AfAMax, which uses them to send the confirmation code and to hold the appointment; the adapter neither stores nor logs them. See [AfAMax privacy information](https://afamax.de/datenschutz) and [SECURITY.md](SECURITY.md).
 
 ## Roadmap
 
-The repository can grow beyond its initial calculation tools. Potential future capabilities include:
+The repository can grow beyond its current calculation, pricing, and booking tools. Potential future capabilities include:
 
 - Property and market-value estimation
 - Appraisal and valuation-report workflows

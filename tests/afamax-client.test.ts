@@ -6,10 +6,28 @@ import {
   validOutput,
   validPurchasePriceAllocationInput,
   validPurchasePriceAllocationOutput,
+  validAvailabilityInput,
+  validAvailabilityOutput,
+  validBookingStepOneInput,
+  validPriceQuoteInput,
+  validPriceQuoteOutput,
+  validVerificationRequiredOutput,
 } from "./fixtures.js";
 
 const afaUrl = new URL("https://afamax.de/api/v1/afa-calculation");
 const kpaUrl = new URL("https://afamax.de/api/v1/purchase-price-allocation");
+const priceUrl = new URL("https://afamax.de/api/v1/price-quote");
+const availabilityUrl = new URL(
+  "https://afamax.de/api/v1/appointments/availability",
+);
+const bookingUrl = new URL("https://afamax.de/api/v1/appointments/book");
+const endpoints = {
+  apiUrl: afaUrl,
+  purchasePriceAllocationApiUrl: kpaUrl,
+  priceQuoteApiUrl: priceUrl,
+  appointmentAvailabilityApiUrl: availabilityUrl,
+  appointmentBookingApiUrl: bookingUrl,
+};
 
 describe("AfamaxClient", () => {
   it("forwards the service identity and validated client address", async () => {
@@ -22,8 +40,7 @@ describe("AfamaxClient", () => {
       },
     );
     const client = new AfamaxClient({
-      apiUrl: afaUrl,
-      purchasePriceAllocationApiUrl: kpaUrl,
+      ...endpoints,
       timeoutMs: 1000,
       serviceToken: "x".repeat(32),
       fetch: fetchMock,
@@ -44,8 +61,7 @@ describe("AfamaxClient", () => {
       },
     );
     const client = new AfamaxClient({
-      apiUrl: afaUrl,
-      purchasePriceAllocationApiUrl: kpaUrl,
+      ...endpoints,
       timeoutMs: 1000,
       fetch: fetchMock,
     });
@@ -55,8 +71,7 @@ describe("AfamaxClient", () => {
 
   it("maps rate limits without leaking an upstream body", async () => {
     const client = new AfamaxClient({
-      apiUrl: afaUrl,
-      purchasePriceAllocationApiUrl: kpaUrl,
+      ...endpoints,
       timeoutMs: 1000,
       fetch: async () =>
         Response.json(
@@ -80,8 +95,7 @@ describe("AfamaxClient", () => {
 
   it("rejects an invalid upstream success response", async () => {
     const client = new AfamaxClient({
-      apiUrl: afaUrl,
-      purchasePriceAllocationApiUrl: kpaUrl,
+      ...endpoints,
       timeoutMs: 1000,
       fetch: async () => Response.json({ calculationId: "incomplete" }),
     });
@@ -105,8 +119,7 @@ describe("AfamaxClient", () => {
       },
     );
     const client = new AfamaxClient({
-      apiUrl: afaUrl,
-      purchasePriceAllocationApiUrl: kpaUrl,
+      ...endpoints,
       timeoutMs: 1_000,
       serviceToken: "x".repeat(32),
       fetch: fetchMock,
@@ -122,8 +135,7 @@ describe("AfamaxClient", () => {
 
   it("rejects an invalid purchase price allocation success response", async () => {
     const client = new AfamaxClient({
-      apiUrl: afaUrl,
-      purchasePriceAllocationApiUrl: kpaUrl,
+      ...endpoints,
       timeoutMs: 1_000,
       fetch: async () => Response.json({ calculationId: "incomplete" }),
     });
@@ -132,6 +144,153 @@ describe("AfamaxClient", () => {
       client.calculatePurchasePriceAllocation(
         validPurchasePriceAllocationInput,
       ),
+    ).rejects.toMatchObject({ code: "invalid_response" });
+  });
+
+  it("posts price quotes to their endpoint and validates the response", async () => {
+    const fetchMock = vi.fn(
+      async (url: string | URL | Request, init?: RequestInit) => {
+        expect(String(url)).toBe(String(priceUrl));
+        expect(init?.method).toBe("POST");
+        expect(JSON.parse(String(init?.body))).toEqual(validPriceQuoteInput);
+        return Response.json(validPriceQuoteOutput);
+      },
+    );
+    const client = new AfamaxClient({
+      ...endpoints,
+      timeoutMs: 1_000,
+      fetch: fetchMock,
+    });
+
+    await expect(client.priceQuote(validPriceQuoteInput)).resolves.toEqual(
+      validPriceQuoteOutput,
+    );
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it("requests availability with GET query parameters and no body", async () => {
+    const fetchMock = vi.fn(
+      async (url: string | URL | Request, init?: RequestInit) => {
+        const requested = new URL(String(url));
+        expect(requested.origin + requested.pathname).toBe(
+          String(availabilityUrl),
+        );
+        expect(Object.fromEntries(requested.searchParams)).toEqual({
+          days: "1",
+          maxSlotsPerDay: "32",
+          locale: "en",
+        });
+        expect(init?.method).toBe("GET");
+        expect(init?.body).toBeUndefined();
+        const headers = new Headers(init?.headers);
+        expect(headers.has("content-type")).toBe(false);
+        expect(headers.get("x-afamax-service-token")).toBe("x".repeat(32));
+        expect(headers.get("x-afamax-client-ip")).toBe("203.0.113.10");
+        return Response.json(validAvailabilityOutput);
+      },
+    );
+    const client = new AfamaxClient({
+      ...endpoints,
+      timeoutMs: 1_000,
+      serviceToken: "x".repeat(32),
+      fetch: fetchMock,
+    });
+
+    await expect(
+      client.availableAppointments(validAvailabilityInput, {
+        clientIp: "203.0.113.10",
+      }),
+    ).resolves.toEqual(validAvailabilityOutput);
+  });
+
+  it("posts bookings to their endpoint", async () => {
+    const fetchMock = vi.fn(
+      async (url: string | URL | Request, init?: RequestInit) => {
+        expect(String(url)).toBe(String(bookingUrl));
+        expect(init?.method).toBe("POST");
+        expect(JSON.parse(String(init?.body))).toEqual(
+          validBookingStepOneInput,
+        );
+        return Response.json(validVerificationRequiredOutput);
+      },
+    );
+    const client = new AfamaxClient({
+      ...endpoints,
+      timeoutMs: 1_000,
+      fetch: fetchMock,
+    });
+
+    await expect(
+      client.bookAppointment(validBookingStepOneInput),
+    ).resolves.toEqual(validVerificationRequiredOutput);
+  });
+
+  it("passes through an actionable booking refusal with its website fallback", async () => {
+    const client = new AfamaxClient({
+      ...endpoints,
+      timeoutMs: 1_000,
+      fetch: async () =>
+        Response.json(
+          {
+            errorCode: "SLOT_UNAVAILABLE",
+            errorMessage: "The selected slot is no longer available.",
+            fallbackUrl: "https://afamax.de/en/contact",
+          },
+          { status: 409 },
+        ),
+    });
+
+    await expect(
+      client.bookAppointment(validBookingStepOneInput),
+    ).rejects.toMatchObject({
+      code: "upstream_refused",
+      message: "The selected slot is no longer available.",
+      upstreamCode: "SLOT_UNAVAILABLE",
+      fallbackUrl: "https://afamax.de/en/contact",
+    });
+  });
+
+  it("drops a non-http fallback link and keeps unstructured errors generic", async () => {
+    const client = new AfamaxClient({
+      ...endpoints,
+      timeoutMs: 1_000,
+      fetch: async () =>
+        Response.json(
+          {
+            errorCode: "BOOKING_UNAVAILABLE",
+            errorMessage: "Online appointment booking is currently unavailable.",
+            fallbackUrl: "javascript:alert(1)",
+          },
+          { status: 503 },
+        ),
+    });
+    await expect(
+      client.bookAppointment(validBookingStepOneInput),
+    ).rejects.toMatchObject({
+      code: "service_disabled",
+      upstreamCode: "BOOKING_UNAVAILABLE",
+      fallbackUrl: undefined,
+    });
+
+    const opaque = new AfamaxClient({
+      ...endpoints,
+      timeoutMs: 1_000,
+      fetch: async () => new Response("nope", { status: 404 }),
+    });
+    await expect(opaque.priceQuote(validPriceQuoteInput)).rejects.toMatchObject(
+      { code: "invalid_response" },
+    );
+  });
+
+  it("rejects an invalid availability success response", async () => {
+    const client = new AfamaxClient({
+      ...endpoints,
+      timeoutMs: 1_000,
+      fetch: async () => Response.json({ requestId: "incomplete" }),
+    });
+
+    await expect(
+      client.availableAppointments(validAvailabilityInput),
     ).rejects.toMatchObject({ code: "invalid_response" });
   });
 });
