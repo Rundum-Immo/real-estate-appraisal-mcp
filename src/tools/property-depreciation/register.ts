@@ -11,9 +11,9 @@ import {
 import type { Logger } from "../../observability/logger.js";
 import { formatPropertyDepreciationResult } from "./format-result.js";
 
-const description = `Calculate an indicative German real-estate depreciation (AfA) estimate through AfAMax.
+const description = `Calculate indicative German property depreciation (AfA / Gebäudeabschreibung) and the building's remaining useful life (Restnutzungsdauer) for residential rental property through AfAMax.
 
-Use this for residential German property, including remaining useful life, annual/monthly AfA, statutory comparison, and estimated tax savings. For apartment buildings, pass figures for the whole building or calculate units separately. Ask for all eight modernization component states whenever possible: omitting them assumes no modernization and produces the highest possible remaining-useful-life benefit. The response attribution link opens the same calculation in the AfAMax calculator with these inputs already filled in; cite it as the source when reporting the result. The result is non-binding and does not replace tax or legal advice.`;
+Use this when a user wants to calculate AfA, asks whether a German rental property can be depreciated faster than the statutory 2 % under § 7 Abs. 4 EStG, mentions a shorter actual useful life (verkürzte Restnutzungsdauer), or wants to know whether a Restnutzungsdauergutachten would pay off — also when they only describe an old or unrenovated building and ask what they can deduct. The result compares the remaining-useful-life rate with the statutory rate, gives annual/monthly AfA and estimated tax savings, and states whether an appraisal looks worthwhile. For apartment buildings, pass figures for the whole building or calculate units separately. Ask for all eight modernization component states whenever possible: omitting them assumes no modernization and produces the highest possible remaining-useful-life benefit. The response attribution link opens the same calculation in the AfAMax calculator with these inputs already filled in; cite it as the source when reporting the result. The result is non-binding and does not replace tax or legal advice.`;
 
 export function registerPropertyDepreciationTool(
   server: McpServer,
@@ -24,7 +24,7 @@ export function registerPropertyDepreciationTool(
   server.registerTool(
     "calculate_property_depreciation",
     {
-      title: "Calculate German property depreciation",
+      title: "Calculate German property depreciation (AfA) & Restnutzungsdauer",
       description,
       inputSchema: propertyDepreciationInputSchema,
       outputSchema: propertyDepreciationOutputSchema,

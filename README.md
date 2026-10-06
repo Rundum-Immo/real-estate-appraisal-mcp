@@ -1,6 +1,6 @@
 # Rundum Immo Real Estate Appraisal MCP
 
-An open-source Model Context Protocol server for indicative German real-estate depreciation and purchase-price allocation. It exposes `calculate_property_depreciation` and `calculate_purchase_price_allocation`, delegating both calculations to the public [AfAMax](https://afamax.de) APIs, plus `get_price_by_product`, `get_available_appointments`, and `book_appointment` for AfAMax appraisal prices and free initial-call bookings. Proprietary appraisal formulas remain in AfAMax.
+An open-source Model Context Protocol server for indicative German real-estate depreciation (AfA / Gebäudeabschreibung), remaining useful life (Restnutzungsdauer) and purchase-price allocation (Kaufpreisaufteilung). It helps answer questions such as whether a rental property can be depreciated faster than the statutory rate under § 7 Abs. 4 EStG, or whether a Restnutzungsdauergutachten would pay off. It exposes `calculate_property_depreciation` and `calculate_purchase_price_allocation`, delegating both calculations to the public [AfAMax](https://afamax.de) APIs, plus `get_price_by_product`, `get_available_appointments`, and `book_appointment` for AfAMax appraisal prices and free initial-call bookings. Proprietary appraisal formulas remain in AfAMax.
 
 <!-- mcp-name: immo.rundum/real-estate-appraisal -->
 

@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "immo.rundum/real-estate-appraisal",
-  "title": "Rundum Immo Real Estate Appraisal",
-  "description": "German property depreciation, purchase-price allocation, appraisal prices and bookings via AfAMax.",
+  "title": "German Real Estate Depreciation & Restnutzungsdauer",
+  "description": "German property depreciation (AfA), Restnutzungsdauer, Kaufpreisaufteilung & appraisals via AfAMax",
   "version": "0.2.0",
   "websiteUrl": "https://afamax.de",
   "repository": {

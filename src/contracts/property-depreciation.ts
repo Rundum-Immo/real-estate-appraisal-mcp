@@ -51,27 +51,35 @@ export const propertyDepreciationInputSchema = z
   .object({
     propertyType: z
       .enum(propertyTypes)
-      .describe("German residential property category."),
+      .describe(
+        "German residential property category. CONDOMINIUM = Eigentumswohnung, ROW_HOUSE = Reihenhaus, SEMI_DETACHED = Doppelhaushälfte, APARTMENT_BUILDING = Mehrfamilienhaus, RESIDENTIAL_COMMERCIAL_BUILDING = Wohn- und Geschäftshaus.",
+      ),
     constructionYear: z
       .number()
       .int()
       .min(1800)
-      .describe("Original year of construction."),
+      .describe("Original year of construction. / Baujahr."),
     floorArea: z
       .number()
       .min(10)
       .max(100_000)
-      .describe("Living or usable floor area in square metres."),
-    purchasePrice: nullableNonNegative.describe("Total purchase price in EUR."),
-    landArea: nullableNonNegative.describe("Land area in square metres."),
+      .describe(
+        "Living or usable floor area in square metres. / Wohn- bzw. Nutzfläche.",
+      ),
+    purchasePrice: nullableNonNegative.describe(
+      "Total purchase price in EUR. / Kaufpreis.",
+    ),
+    landArea: nullableNonNegative.describe(
+      "Land area in square metres. / Grundstücksfläche.",
+    ),
     standardLandValue: nullableNonNegative.describe(
-      "Standard land value in EUR per square metre.",
+      "Standard land value in EUR per square metre. / Bodenrichtwert.",
     ),
     includedInventory: nullableNonNegative.describe(
       "Movable inventory included in the purchase price, in EUR.",
     ),
     purchaseRelatedCosts: nullableNonNegative.describe(
-      "Purchase-related costs in EUR.",
+      "Purchase-related costs in EUR (land transfer tax, notary, land register, broker). / Kaufnebenkosten.",
     ),
     coreRenovationYear: z
       .number()
@@ -79,14 +87,18 @@ export const propertyDepreciationInputSchema = z
       .min(1801)
       .nullable()
       .optional()
-      .describe("Year of a qualifying core renovation, if applicable."),
+      .describe(
+        "Year of a qualifying core renovation, if applicable. / Jahr einer Kernsanierung.",
+      ),
     taxRate: z
       .number()
       .positive()
       .max(0.6)
       .nullable()
       .optional()
-      .describe("Personal marginal tax rate as a decimal, e.g. 0.42."),
+      .describe(
+        "Personal marginal income tax rate as a decimal, e.g. 0.42. / Grenzsteuersatz.",
+      ),
     locale: z
       .enum(["de", "en"])
       .nullable()
@@ -103,7 +115,7 @@ export const propertyDepreciationInputSchema = z
       .nullable()
       .optional()
       .describe(
-        "Known state of eight modernization components. Ask for all eight when possible.",
+        "Known state of eight modernization components (Modernisierungselemente): roof (Dach), facadeInsulation (Fassadendämmung), windowsDoors (Fenster und Außentüren), heating (Heizung), utilities (Leitungen), bathrooms (Bäder), interiorFitout (Innenausbau), floorplanImprovement (Grundrissverbesserung). Ask for all eight when possible.",
       ),
   })
   .strict()
@@ -154,18 +166,40 @@ export const propertyDepreciationOutputSchema = z
     calculationId: z.string().min(1),
     input: normalizedInputSchema,
     results: z.object({
-      afaRatePerYear: z.number(),
-      defaultAfaRatePerYear: z.number(),
-      annualAfaAmount: z.number(),
-      defaultAfaAmount: z.number(),
+      afaRatePerYear: z
+        .number()
+        .describe(
+          "AfA rate per year from the estimated remaining useful life, as a decimal (0.0333 = 3.33 %).",
+        ),
+      defaultAfaRatePerYear: z
+        .number()
+        .describe(
+          "Statutory AfA rate under § 7 Abs. 4 EStG for comparison, as a decimal.",
+        ),
+      annualAfaAmount: z
+        .number()
+        .describe("Annual AfA in EUR at afaRatePerYear."),
+      defaultAfaAmount: z
+        .number()
+        .describe("Annual AfA in EUR at the statutory rate."),
       monthlyAfaAmount: z.number(),
-      annualTaxSavings: z.number(),
-      appraisalWorthwhile: z.boolean(),
+      annualTaxSavings: z
+        .number()
+        .describe("Estimated income tax saved per year by annualAfaAmount at taxRate."),
+      appraisalWorthwhile: z
+        .boolean()
+        .describe(
+          "Whether the remaining-useful-life rate is high enough for a Restnutzungsdauergutachten to look worthwhile.",
+        ),
       monthlyTaxSavings: z.number(),
-      buildingValue: z.number(),
+      buildingValue: z
+        .number()
+        .describe("Depreciable building value in EUR (excluding land)."),
       buildingValueSource: z.enum(["actual", "assumed"]),
       taxRate: z.number(),
-      remainingUsefulLifeYears: z.number(),
+      remainingUsefulLifeYears: z
+        .number()
+        .describe("Estimated remaining useful life (Restnutzungsdauer) in years."),
       modernizationPointsUsed: z.number().min(0).max(20),
       currency: z.literal("EUR"),
     }),

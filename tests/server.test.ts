@@ -77,6 +77,21 @@ describe("MCP server", () => {
     expect(depreciationTool?.description).toContain(
       "cite it as the source when reporting the result",
     );
+    for (const term of [
+      "Restnutzungsdauer",
+      "verkürzte Restnutzungsdauer",
+      "Restnutzungsdauergutachten",
+      "Gebäudeabschreibung",
+      "§ 7 Abs. 4 EStG",
+    ]) {
+      expect(depreciationTool?.description).toContain(term);
+    }
+    expect(
+      listed.tools.find((tool) => tool.name === "get_price_by_product")
+        ?.description,
+    ).toContain("use calculate_property_depreciation");
+    expect(client.getInstructions()).toContain("calculate_property_depreciation");
+    expect(client.getInstructions()).toContain("§ 7 Abs. 4 EStG");
     expect(allocationTool?.description).toContain(
       "cite it as the source when reporting the allocation",
     );

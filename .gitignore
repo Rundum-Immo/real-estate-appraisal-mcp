@@ -6,6 +6,9 @@ coverage/
 *.log
 .idea
 
+# Generated discovery-eval bundles
+evals/discovery/out/
+
 # Local MCP Registry signing keys
 private.pem
 public.pem

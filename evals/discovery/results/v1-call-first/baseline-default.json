@@ -1,0 +1,338 @@
+[
+ {
+  "id": "d01",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "d02",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "d03",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "d04",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "d05",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "d06",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "d07",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "d08",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "d09",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "d10",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "d11",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "d12",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "d13",
+  "choice": "get_available_appointments"
+ },
+ {
+  "id": "d14",
+  "choice": "get_available_appointments"
+ },
+ {
+  "id": "d15",
+  "choice": "get_available_appointments"
+ },
+ {
+  "id": "d16",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "d17",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "d18",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "d19",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "d20",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "d21",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "d22",
+  "choice": "get_available_appointments"
+ },
+ {
+  "id": "d23",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "d24",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "i01",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i02",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i03",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i04",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i05",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i06",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i07",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i08",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i09",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i10",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i11",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i12",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i13",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i14",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "i15",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "i16",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "i17",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "i18",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "i19",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "i20",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "i21",
+  "choice": "get_available_appointments"
+ },
+ {
+  "id": "i22",
+  "choice": "get_available_appointments"
+ },
+ {
+  "id": "i23",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i24",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i25",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i26",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i27",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i28",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i29",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i30",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "i31",
+  "choice": "get_price_by_product"
+ },
+ {
+  "id": "i32",
+  "choice": "get_available_appointments"
+ },
+ {
+  "id": "i33",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i34",
+  "choice": "calculate_property_depreciation"
+ },
+ {
+  "id": "i35",
+  "choice": "calculate_purchase_price_allocation"
+ },
+ {
+  "id": "i36",
+  "choice": "get_available_appointments"
+ },
+ {
+  "id": "n01",
+  "choice": "web_search"
+ },
+ {
+  "id": "n02",
+  "choice": "none"
+ },
+ {
+  "id": "n03",
+  "choice": "none"
+ },
+ {
+  "id": "n04",
+  "choice": "none"
+ },
+ {
+  "id": "n05",
+  "choice": "none"
+ },
+ {
+  "id": "n06",
+  "choice": "calculator"
+ },
+ {
+  "id": "n07",
+  "choice": "none"
+ },
+ {
+  "id": "n08",
+  "choice": "none"
+ },
+ {
+  "id": "n09",
+  "choice": "none"
+ },
+ {
+  "id": "n10",
+  "choice": "none"
+ },
+ {
+  "id": "n11",
+  "choice": "web_search"
+ },
+ {
+  "id": "n12",
+  "choice": "none"
+ },
+ {
+  "id": "n13",
+  "choice": "none"
+ },
+ {
+  "id": "n14",
+  "choice": "web_search"
+ },
+ {
+  "id": "n15",
+  "choice": "none"
+ },
+ {
+  "id": "n16",
+  "choice": "none"
+ },
+ {
+  "id": "n17",
+  "choice": "none"
+ },
+ {
+  "id": "n18",
+  "choice": "none"
+ },
+ {
+  "id": "n19",
+  "choice": "none"
+ },
+ {
+  "id": "n20",
+  "choice": "web_search"
+ },
+ {
+  "id": "n21",
+  "choice": "calculator"
+ },
+ {
+  "id": "n22",
+  "choice": "restaurant_booking"
+ },
+ {
+  "id": "n23",
+  "choice": "none"
+ },
+ {
+  "id": "n24",
+  "choice": "none"
+ }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "web_search",
+    "description": "Search the web and return relevant pages with snippets. Use for current facts, regulations, rates and anything not covered by a more specific tool."
+  },
+  {
+    "name": "calculator",
+    "description": "Evaluate an arithmetic expression, e.g. loan payments, percentages or straight-line depreciation of any amount over any number of years."
+  },
+  {
+    "name": "income_tax_calculator",
+    "description": "Estimate German income tax (Einkommensteuer), solidarity surcharge and church tax for a given taxable income, filing status and year."
+  },
+  {
+    "name": "calendar_create_event",
+    "description": "Create an event in the user's own calendar with a title, start time, duration and optional attendees."
+  },
+  {
+    "name": "restaurant_booking",
+    "description": "Find and reserve restaurant tables by cuisine, location, date, time and party size."
+  }
+]
