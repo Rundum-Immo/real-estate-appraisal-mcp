@@ -3,7 +3,7 @@
   "name": "immo.rundum/real-estate-appraisal",
   "title": "German Real Estate Depreciation & Restnutzungsdauer",
   "description": "German property depreciation (AfA), Restnutzungsdauer, Kaufpreisaufteilung & appraisals via AfAMax",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "websiteUrl": "https://afamax.de",
   "repository": {
     "url": "https://github.com/Rundum-Immo/real-estate-appraisal-mcp",
@@ -13,7 +13,7 @@
     {
       "registryType": "npm",
       "identifier": "@rundum-immo/real-estate-appraisal-mcp",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "transport": { "type": "stdio" }
     }
   ],
