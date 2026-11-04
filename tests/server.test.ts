@@ -214,6 +214,37 @@ describe("MCP server", () => {
     await close();
   });
 
+  it("quotes AfA-Verteidigung through the MCP request and response schemas", async () => {
+    const provider = createProvider();
+    const output = {
+      ...validPriceQuoteOutput,
+      product: "afa_verteidigung" as const,
+      productLabel: "AfA-Verteidigung",
+    };
+    provider.getPriceQuote.mockResolvedValueOnce(output);
+    const { client, close } = await connect(provider);
+    try {
+      const result = await client.callTool({
+        name: "get_price_by_product",
+        arguments: { product: "afa_verteidigung" },
+      });
+      expect(result.isError).not.toBe(true);
+      expect(result.structuredContent).toEqual(output);
+      expect(textOf(result)).toContain("AfA-Verteidigung");
+      expect(provider.getPriceQuote).toHaveBeenCalledExactlyOnceWith(
+        {
+          product: "afa_verteidigung",
+          viewingType: "none",
+          expressDelivery: false,
+          locale: "de",
+        },
+        {},
+      );
+    } finally {
+      await close();
+    }
+  });
+
   it("lists appointment slots with their bookable start times", async () => {
     const provider = createProvider();
     const { client, close } = await connect(provider);

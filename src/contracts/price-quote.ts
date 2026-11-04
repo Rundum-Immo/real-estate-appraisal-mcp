@@ -8,6 +8,7 @@ export const priceProducts = [
   "vollgutachten",
   "kaufpreisaufteilung",
   "versetzbarkeitsgutachten",
+  "afa_verteidigung",
 ] as const;
 
 export const viewingTypes = ["none", "exterior", "interior_exterior"] as const;
@@ -25,7 +26,9 @@ export const priceQuoteInputSchema = z
           "`kaufpreisaufteilung` — Kaufpreisaufteilung / purchase-price allocation report " +
           "(land vs. building). " +
           "`versetzbarkeitsgutachten` — Versetzbarkeitsgutachten / relocatability certificate " +
-          "for tiny houses, mobile homes, modular units and containers.",
+          "for tiny houses, mobile homes, modular units and containers. " +
+          "`afa_verteidigung` — AfA-Verteidigung / second remaining-useful-life appraisal " +
+          "that defends an AfA the tax office rejected.",
       ),
     viewingType: nullAsAbsent(
       z.enum(viewingTypes).optional().default("none"),

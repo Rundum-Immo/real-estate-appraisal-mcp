@@ -114,7 +114,7 @@ Example input:
 
 ### Appraisal prices
 
-`get_price_by_product` returns the current AfAMax list price in EUR, including German VAT, for one product: `rnd` (Restnutzungsdauergutachten), `kurzgutachten`, `vollgutachten`, `kaufpreisaufteilung`, or `versetzbarkeitsgutachten`.
+`get_price_by_product` returns the current AfAMax list price in EUR, including German VAT, for one product: `rnd` (Restnutzungsdauergutachten), `kurzgutachten`, `vollgutachten`, `kaufpreisaufteilung`, `versetzbarkeitsgutachten`, or `afa_verteidigung` (AfA-Verteidigung, a second remaining-useful-life appraisal to defend an AfA the tax office rejected).
 
 - Optional: property inspection (`none`, `exterior`, `interior_exterior`), express processing, and property type with flat count for the per-flat price of multi-unit buildings.
 - Results: the total with its breakdown, net price, a table of every surcharge for comparing options, and a source link to the product page.

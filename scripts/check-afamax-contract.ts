@@ -130,6 +130,7 @@ const expectedPriceProducts = [
   "vollgutachten",
   "kaufpreisaufteilung",
   "versetzbarkeitsgutachten",
+  "afa_verteidigung",
 ];
 const expectedAvailabilityParameters = [
   "from",
