@@ -34,7 +34,8 @@ export function registerBookAppointmentTool(
       outputSchema: bookingOutputSchema,
       annotations: {
         readOnlyHint: false,
-        destructiveHint: false,
+        // Verification emails and calendar invitations cannot be recalled.
+        destructiveHint: true,
         idempotentHint: false,
         openWorldHint: true,
       },

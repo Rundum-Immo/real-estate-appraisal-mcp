@@ -169,7 +169,7 @@ describe("MCP server", () => {
     await close();
   });
 
-  it("annotates the booking tool as writing to the outside world", async () => {
+  it("annotates the booking tool as writing to the outside world with irreversible sends", async () => {
     const { client, close } = await connect(createProvider());
     const { tools } = await client.listTools();
     const annotations = Object.fromEntries(
@@ -186,7 +186,7 @@ describe("MCP server", () => {
     });
     expect(annotations.book_appointment).toMatchObject({
       readOnlyHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
       idempotentHint: false,
       openWorldHint: true,
     });
