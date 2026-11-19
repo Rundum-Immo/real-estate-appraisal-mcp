@@ -127,7 +127,7 @@ Discount codes are not applied; the price shown when ordering is binding.
 
 ### Initial-call appointments
 
-`get_available_appointments` lists open slots for a free, non-binding 15-minute phone call with the AfAMax team, on weekdays in Europe/Berlin, grouped by day. It looks up to 21 days ahead (default 7) and lists up to 32 slots per day (default 8), with each day's full free-slot count.
+`get_available_appointments` lists open slots for a free, non-binding 30-minute phone call with the AfAMax team, on weekdays in Europe/Berlin, grouped by day. It looks up to 21 days ahead (default 7) and lists up to 32 slots per day (default 8), with each day's full free-slot count.
 
 ```json
 { "days": 1, "maxSlotsPerDay": 32, "locale": "en" }
