@@ -11,7 +11,7 @@ import type { Logger } from "../../observability/logger.js";
 import { providerErrorResult } from "../tool-error.js";
 import { formatBookingResult } from "./format-result.js";
 
-const description = `Books a free 15-minute initial phone call with the AfAMax team, in two steps.
+const description = `Books a free 30-minute initial phone call with the AfAMax team, in two steps.
 
 STEP 1: after the user picked a slot from get_available_appointments, confirm the slot, their name and their own e-mail address with them, then call with startDateTime, name, email (and optionally phone, locale). AfAMax e-mails a 6-digit code to that address and returns status "verification_required" with a verificationId.
 
